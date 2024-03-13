@@ -48,7 +48,9 @@ public class RecommendationRepo : IRecommendationRepo
             Id = guid,
             Name = recommendation.Name,
             Description = recommendation.Description,
-            Suggestions = recommendation.Suggestions.Select(s => new SongEntity { Id = Guid.NewGuid(), PlaylistRecommendationEntityId = guid, Title = s.Title, Artist = s.Artist }).ToList()
+            Suggestions = recommendation.Suggestions is null ?
+            new List<SongEntity>() :
+            recommendation.Suggestions.Select(s => new SongEntity { Id = Guid.NewGuid(), PlaylistRecommendationEntityId = guid, Title = s.Title, Artist = s.Artist }).ToList()
         };
         _context.Entry(entity).State = EntityState.Added;
         _context.Songs.AddRange(entity.Suggestions);

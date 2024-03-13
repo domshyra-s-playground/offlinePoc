@@ -4,17 +4,24 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Grid, IconButton, Link, Typography } from "@mui/material";
 
 import GitHubIcon from "@mui/icons-material/GitHub";
-import Index from "../components/Index";
 import PlaylistDetails from "../components/PlaylistDetails";
+import RecommendationForm from "../components/forms/RecommendationForm";
+import StyledAppBar from "../components/StyledAppBar";
+import ViewPlaylists from "../components/ViewPlaylists";
+import ViewRecommendations from "../components/ViewRecommendations";
 
 function App() {
 	return (
 		<BrowserRouter>
+			<StyledAppBar />
 			<div className="App">
 				<Grid mt={2}>
 					<Routes>
-						<Route path="/" element={<Index />} />
+						<Route path="/" element={<ViewPlaylists />} />
 						<Route path="/playlist/:playlistId" element={<PlaylistDetails />} />
+						<Route path="/recommendations" element={<ViewRecommendations />} />
+						<Route path="/recommendations/create" element={<RecommendationForm />} />
+						<Route path="/recommendations/form/:id" element={<RecommendationForm />} />
 					</Routes>
 				</Grid>
 				<Grid container justifyContent="center" pb={2}>

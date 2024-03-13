@@ -7,9 +7,9 @@ import AspectRatio from "@mui/joy/AspectRatio";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
+import OpenInSpotifyText from "./subcomponets/OpenInfSpotify";
 import { PropTypes } from "prop-types";
 import Typography from "@mui/material/Typography";
-import openInSpotifyText from "./subcomponets/openInfSpotify";
 import { renderHeart } from "./HeartRatings";
 import { useNavigate } from "react-router-dom";
 
@@ -45,7 +45,7 @@ const PlaylistCardDetails = ({ title, imageURL, description, genre, trackCount, 
 							{description}
 						</Typography>
 						{heart()}
-						{openInSpotifyText(playlistId)}
+						{OpenInSpotifyText(playlistId)}
 						<Typography variant="subtitle2" color="text.secondary" component="div" gutterBottom>
 							{genre}
 						</Typography>

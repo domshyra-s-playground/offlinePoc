@@ -5,7 +5,7 @@ import PlaylistCard from "./PlaylistCardSelfFetching";
 import { useGetPlaylistsQuery } from "../redux/services/spotifyApi";
 import { useGetRatingsQuery } from "../redux/services/playlistRatingApi";
 
-const Index = () => {
+const ViewPlaylists = () => {
 	const { data, isLoading } = useGetPlaylistsQuery();
 	const [cards, setCards] = useState([]);
 
@@ -39,4 +39,4 @@ const Index = () => {
 	);
 };
 
-export default Index;
+export default ViewPlaylists;

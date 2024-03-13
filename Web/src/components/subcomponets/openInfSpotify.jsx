@@ -1,6 +1,6 @@
 import { Link, Typography } from "@mui/material";
 
-function openInSpotifyText(playlistId) {
+function OpenInSpotifyText(playlistId) {
 	return (
 		<Typography variant="subtitle2" color="text.secondary" component="div" gutterBottom>
 			<Link rel="noopener" target="_blank" href={`https://open.spotify.com/playlist/${playlistId}`} underline="hover">
@@ -10,4 +10,4 @@ function openInSpotifyText(playlistId) {
 	);
 }
 
-export default openInSpotifyText;
+export default OpenInSpotifyText;

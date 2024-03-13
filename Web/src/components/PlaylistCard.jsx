@@ -7,9 +7,9 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import OpenInSpotifyText from "./subcomponets/OpenInfSpotify";
 import { PropTypes } from "prop-types";
 import Typography from "@mui/material/Typography";
-import openInSpotifyText from "./subcomponets/openInfSpotify";
 import { renderHeart } from "./HeartRatings";
 import { useNavigate } from "react-router-dom";
 
@@ -43,7 +43,7 @@ const PlaylistCard = ({ title, imageURL, description, genre, trackAndFollowerTex
 						{description}
 					</Typography>
 					{heart()}
-					{openInSpotifyText(playlistId)}
+					{OpenInSpotifyText(playlistId)}
 					{/* mobile */}
 					<Typography sx={{ display: { xs: "block", md: "none" } }} component="div" variant="caption" color="text.secondary" align="center">
 						{genre}
