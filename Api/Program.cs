@@ -20,6 +20,7 @@ builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.AddScoped<ISpotifyProvider, SpotifyProvider>();
 builder.Services.AddScoped<IPlaylistRepo, PlaylistRepo>();
+builder.Services.AddScoped<IRecommendationRepo, RecommendationRepo>();
 
 var app = builder.Build();
 
@@ -36,6 +37,7 @@ app.UseHttpsRedirection();
 //Routes
 UseSpotifyPlaylistRoutes(app);
 UseRatingsRoutes(app);
+UseRecommendationsRoutes(app);
 
 
 //TODO remove
@@ -53,31 +55,31 @@ static void UseSpotifyPlaylistRoutes(WebApplication app)
     {
         app.Logger.LogInformation("Getting playlists");
         return await _spotifyProvider.GetPlaylists();
-    }).WithName("GetSpotifyPlaylists");
+    }).WithName("GetSpotifyPlaylists").WithTags("Spotify");
 
     app.MapGet("/spotify/{playlistId}", async (string playlistId, ISpotifyProvider _spotifyProvider) =>
     {
         app.Logger.LogInformation($"Getting playlist with id {playlistId}");
         return await _spotifyProvider.GetPlaylist(playlistId);
-    }).WithName("GetSpotifyPlaylist");
+    }).WithName("GetSpotifyPlaylist").WithTags("Spotify");
 }
 
 static void UseRatingsRoutes(WebApplication app)
 {
-    app.MapGet("/ratings", (IPlaylistRepo repo) => repo.GetRatings()).Produces<PlaylistRatingDto[]>(StatusCodes.Status200OK);
+    app.MapGet("/ratings", (IPlaylistRepo repo) => repo.GetRatings()).Produces<PlaylistRatingDto[]>(StatusCodes.Status200OK).WithTags("Ratings");
     app.MapGet("/ratings/{playlistId}", async (string playlistId, IPlaylistRepo repo) =>
     {
         var rating = await repo.GetRating(playlistId);
         if (rating == null)
             return Results.NoContent();
         return Results.Ok(rating);
-    }).Produces<PlaylistRatingDto>(StatusCodes.Status200OK).Produces(StatusCodes.Status204NoContent);
+    }).Produces<PlaylistRatingDto>(StatusCodes.Status200OK).Produces(StatusCodes.Status204NoContent).WithTags("Ratings");
 
     app.MapPost("/ratings/{playlistId}", async (string playlistId, [FromBody] int rating, IPlaylistRepo repo) =>
     {
         var newRating = await repo.AddRating(playlistId, rating);
         return Results.Created($"/ratings/{newRating.Id}", newRating);
-    }).Produces<PlaylistRatingDto>(StatusCodes.Status201Created);
+    }).Produces<PlaylistRatingDto>(StatusCodes.Status201Created).WithTags("Ratings");
 
     app.MapPut("/ratings/{playlistId}", async (string playlistId, [FromBody] int rating, IPlaylistRepo repo) =>
     {
@@ -87,11 +89,45 @@ static void UseRatingsRoutes(WebApplication app)
         var updatedRating = await repo.UpdateRating(playlistId, rating);
         return Results.Ok(updatedRating);
     }).Produces<PlaylistRatingDto>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status204NoContent);
+        .Produces(StatusCodes.Status204NoContent).WithTags("Ratings");
 
     app.MapDelete("/ratings/{id}", async (string id, IPlaylistRepo repo) =>
     {
         await repo.DeleteRating(id);
         return Results.Ok();
-    }).Produces(StatusCodes.Status200OK);
+    }).Produces(StatusCodes.Status200OK).WithTags("Ratings");
+}
+
+static void UseRecommendationsRoutes(WebApplication app)
+{
+    app.MapGet("/recommendations", (IRecommendationRepo repo) => repo.GetRecommendations()).Produces<PlaylistRecommendationDto[]>(StatusCodes.Status200OK).WithTags("Recommendations");
+    app.MapGet("/recommendations/{id}", async (string id, IRecommendationRepo repo) =>
+    {
+        var record = await repo.GetRecommendation(id);
+        if (record == null)
+            return Results.NoContent();
+        return Results.Ok(record);
+    }).Produces<PlaylistRecommendationDto>(StatusCodes.Status200OK).Produces(StatusCodes.Status204NoContent).WithTags("Recommendations");
+
+    app.MapPost("/recommendations", async ([FromBody] PlaylistRecommendationDto recommendation, IRecommendationRepo repo) =>
+    {
+        var newRecord = await repo.AddRecommendation(recommendation);
+        return Results.Created($"/recommendations/{newRecord.Id}", newRecord);
+    }).Produces<PlaylistRecommendationDto>(StatusCodes.Status201Created).WithTags("Recommendations");
+
+    app.MapPut("/recommendations", async ([FromBody] PlaylistRecommendationDto recommendation, IRecommendationRepo repo) =>
+    {
+        var existingRecord = await repo.GetRecommendation(recommendation.Id.ToString());
+        if (existingRecord == null)
+            return Results.NoContent();
+        var updatedRecord = await repo.UpdateRecommendation(recommendation);
+        return Results.Ok(updatedRecord);
+    }).Produces<PlaylistRecommendationDto>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status204NoContent).WithTags("Recommendations");
+
+    app.MapDelete("/recommendations/{id}", async (string id, IRecommendationRepo repo) =>
+    {
+        await repo.DeleteRecommendation(id);
+        return Results.Ok();
+    }).Produces(StatusCodes.Status200OK).WithTags("Recommendations");
 }

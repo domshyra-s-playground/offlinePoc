@@ -1,0 +1,1 @@
+public record PlaylistRecommendationDto(Guid Id, string Name, string Description, List<SongDto> Suggestions);

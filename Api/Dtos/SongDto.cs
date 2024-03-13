@@ -1,0 +1,1 @@
+public record SongDto(Guid Id, Guid RecommendationId, string Title, string Artist);

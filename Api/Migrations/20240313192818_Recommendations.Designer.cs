@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Api.Migrations
 {
     [DbContext(typeof(PlaylistDbContext))]
-    partial class PlaylistDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240313192818_Recommendations")]
+    partial class Recommendations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.28");
@@ -74,7 +76,7 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("PlaylistRecommendationEntityId")
+                    b.Property<Guid?>("PlaylistRecommendationEntityId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
@@ -90,13 +92,10 @@ namespace Api.Migrations
 
             modelBuilder.Entity("SongEntity", b =>
                 {
-                    b.HasOne("PlaylistRecommendationEntity", "PlaylistRecommendationEntity")
+                    b.HasOne("PlaylistRecommendationEntity", null)
                         .WithMany("Suggestions")
                         .HasForeignKey("PlaylistRecommendationEntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PlaylistRecommendationEntity");
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("PlaylistRecommendationEntity", b =>
