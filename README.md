@@ -1,6 +1,7 @@
 [![Web](https://github.com/domshyra/domshyra/actions/workflows/main_domshyraweb.yml/badge.svg?branch=main)](https://github.com/domshyra/domshyra/actions/workflows/main_domshyraweb.yml) [![Api](https://github.com/domshyra/domshyra/actions/workflows/main_domshyraapi.yml/badge.svg)](https://github.com/domshyra/domshyra/actions/workflows/main_domshyraapi.yml)
-# domshyra 
+# Basic Spa app with RtkQuery, React hook forms, and a .net backend 
 Grabs spotify playlists based on appsettings `Spotify:Username` value.
+Has a form and index page to interact with. 
 
 Written in .Net and react
 
@@ -38,6 +39,9 @@ run the following commands to add secrets.
 inorder to use the rating features on play list run `dotnet ef database update`
 
 in vscode use ".NET core launch"
+
+
+#### Database
 
 
 ### Web
