@@ -1,5 +1,6 @@
 import { Box, Button, Container, Grid, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
+import { recommendationsForm, recommendationsRoot } from "../../constants/routes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGetRecommendationQuery, useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,8 +10,10 @@ import { DevTool } from "@hookform/devtools";
 import GenericTextItem from "../subcomponets/GenericTextItem";
 import { LoadingButton } from "@mui/lab";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { connect } from "react-redux";
+import { setToast } from "../../redux/slices/toast";
 
-const RecommendationForm = () => {
+const RecommendationForm = ({ setToast }) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
 	const [songRows, setSongRows] = useState(0);
 	const navigate = useNavigate();
@@ -45,7 +48,12 @@ const RecommendationForm = () => {
 			upsertRecommendation({ data: form, isCreateMode })
 				.then((response) => {
 					console.log(response);
-					navigate("/recommendations");
+					if (response.error) {
+						setToast({ show: true, message: "Error saving recommendation.", isError: true });
+						return;
+					}
+					setToast({ show: true, message: "Recommendation saved.", link: `${recommendationsForm}${response.data.id}` });
+					navigate(recommendationsRoot);
 				})
 				.catch((error) => {
 					console.log(error);
@@ -54,7 +62,7 @@ const RecommendationForm = () => {
 					setShowLoadingButton(false);
 				});
 		},
-		[upsertRecommendation, isCreateMode, navigate]
+		[upsertRecommendation, isCreateMode, setToast, navigate]
 	);
 
 	const songs = useMemo(() => {
@@ -89,7 +97,7 @@ const RecommendationForm = () => {
 		}
 
 		return songSection;
-	}, [methods.control, songRows]);
+	}, [isLoading, methods.control, songRows]);
 
 	const addSongRowButton = useMemo(() => {
 		return (
@@ -203,4 +211,13 @@ const RecommendationForm = () => {
 	);
 };
 
-export default RecommendationForm;
+function mapStateToProps() {
+	return {};
+}
+
+const mapDispatchToProps = {
+	setToast,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(RecommendationForm);
+

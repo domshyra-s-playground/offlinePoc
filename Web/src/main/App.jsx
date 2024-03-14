@@ -2,8 +2,10 @@ import "./App.css";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Grid, IconButton, Link, Typography } from "@mui/material";
+import { recommendationsCreate, recommendationsForm, recommendationsRoot } from "../constants/routes";
 
 import GitHubIcon from "@mui/icons-material/GitHub";
+import { Layout } from "./Layout";
 import PlaylistDetails from "../components/PlaylistDetails";
 import RecommendationForm from "../components/forms/RecommendationForm";
 import StyledAppBar from "../components/StyledAppBar";
@@ -16,13 +18,15 @@ function App() {
 			<StyledAppBar />
 			<div className="App">
 				<Grid mt={2}>
-					<Routes>
-						<Route path="/" element={<ViewPlaylists />} />
-						<Route path="/playlist/:playlistId" element={<PlaylistDetails />} />
-						<Route path="/recommendations" element={<ViewRecommendations />} />
-						<Route path="/recommendations/create" element={<RecommendationForm />} />
-						<Route path="/recommendations/form/:id" element={<RecommendationForm />} />
-					</Routes>
+					<Layout>
+						<Routes>
+							<Route path="/" element={<ViewPlaylists />} />
+							<Route path="/playlist/:playlistId" element={<PlaylistDetails />} />
+							<Route path={recommendationsRoot} element={<ViewRecommendations />} />
+							<Route path={recommendationsCreate} element={<RecommendationForm />} />
+							<Route path={`${recommendationsForm}:id`} element={<RecommendationForm />} />
+						</Routes>
+					</Layout>
 				</Grid>
 				<Grid container justifyContent="center" pb={2}>
 					<Grid item xs={12}>

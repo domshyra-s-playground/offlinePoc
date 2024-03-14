@@ -1,7 +1,10 @@
+import React, { useCallback } from "react";
+import { recommendationsCreate, recommendationsForm } from "../constants/routes";
 import { useDeleteRecommendationMutation, useGetRecommendationsQuery } from "../redux/services/playlistRecommendationApi";
 
-import React from "react";
 import StyledDataGrid from "./subcomponets/StyledDataGrid";
+import { connect } from "react-redux";
+import { setToast } from "../redux/slices/toast";
 
 const columns = [
 	{
@@ -18,9 +21,17 @@ const columns = [
 	},
 ];
 
-const ViewRecommendations = () => {
+const ViewRecommendations = ({ setToast }) => {
 	const { data, isLoading } = useGetRecommendationsQuery();
 	const [deleteRecommendation] = useDeleteRecommendationMutation();
+
+	const deleteRow = useCallback(
+		(id) => {
+			deleteRecommendation(id);
+			setToast({ show: true, message: "Recommendation deleted." });
+		},
+		[deleteRecommendation, setToast]
+	);
 
 	return (
 		<StyledDataGrid
@@ -30,11 +41,18 @@ const ViewRecommendations = () => {
 			title="Recommendations"
 			rows={data ?? []}
 			hyperlinkColumnFieldName="name"
-			hyperlinkUrl="/recommendations/form/"
-			createPath="/recommendations/create"
-			deleteAction={(i) => deleteRecommendation(i)}
+			hyperlinkUrl={recommendationsForm}
+			createPath={recommendationsCreate}
+			deleteAction={deleteRow}
 		/>
 	);
 };
+function mapStateToProps() {
+	return {};
+}
 
-export default ViewRecommendations;
+const mapDispatchToProps = {
+	setToast,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ViewRecommendations);
