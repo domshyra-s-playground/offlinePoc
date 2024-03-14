@@ -33,6 +33,7 @@ Here are some of the Form items in this application that demo basic CRUD operati
 ## Getting Started
 
 ### API
+First navigate to the api folder
 
 might have to run `dotnet dev-certs https --trust` for api
 
@@ -68,6 +69,10 @@ For more information on how to use the database and ef migrations see [here](htt
 in vscode use ".NET core launch"
 
 ### Web
+First navigate to the Web folder
 
 run `npm install`
-in vscode use "Launch Chrome against localhost" or run `npm start`
+
+run `npm start`
+
+in vscode use "Launch Chrome against localhost" to view the website or naviagate to the url webpack outputs in the npm start command 
