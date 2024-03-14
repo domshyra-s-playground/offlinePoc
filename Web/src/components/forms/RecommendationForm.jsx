@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Container, Grid, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGetRecommendationQuery, useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
@@ -61,22 +61,22 @@ const RecommendationForm = () => {
 		const songRow = (index) => {
 			return (
 				<Grid container direction="row" spacing={2} key={index}>
-					<Grid item>
+					<Grid item xs={6}>
 						<GenericTextItem
 							name={`suggestions[${index}].title`}
-							label="Title"
 							id={`suggestions[${index}].title`}
 							customControl={methods.control}
 							fullWidth
+							isLoading={isLoading}
 						/>
 					</Grid>
-					<Grid item>
+					<Grid item xs={6}>
 						<GenericTextItem
 							name={`suggestions[${index}].artist`}
-							label="Artist"
 							id={`suggestions[${index}].artist`}
 							customControl={methods.control}
 							fullWidth
+							isLoading={isLoading}
 						/>
 					</Grid>
 				</Grid>
@@ -129,66 +129,77 @@ const RecommendationForm = () => {
 		);
 	}, [songRows]);
 
+	const submitButton = useMemo(() => {
+		return (
+			<LoadingButton
+				key="bcegsSubmit"
+				id="submit-form-btn"
+				type="submit"
+				color="primary"
+				variant="contained"
+				loading={showLoadingButton}
+				disabled={!isDirty || !isValid}
+			>
+				{isCreateMode ? "Create" : "Save"}
+			</LoadingButton>
+		);
+	}, [isCreateMode, isDirty, isValid, showLoadingButton]);
+
 	return (
-		<FormProvider key="fireStationForm" {...methods}>
-			<Typography variant="h5" gutterBottom id="fireStation-title">
-				{isCreateMode ? "Create" : "Edit"} Recommendation
-			</Typography>
-			<Box key="bcegsFormBox" component="form" noValidate autoComplete="off" onSubmit={methods.handleSubmit(onFormSubmit)}>
-				<Grid container direction="row" spacing={2}>
-					<Grid item>
-						<GenericTextItem
-							name="name"
-							label="Name"
-							id="name"
-							rules={{ required: "Name is required." }}
-							customControl={methods.control}
-							isLoading={isLoading}
-						/>
-					</Grid>
-				</Grid>
-				<Grid container direction="row" spacing={2}>
-					<Grid item>
-						<GenericTextItem
-							name="description"
-							label="Description"
-							id="description"
-							customControl={methods.control}
-							isLoading={isLoading}
-							multiline
-						/>
-					</Grid>
-				</Grid>
-				<Typography variant="h6" gutterBottom id="fireStation-title">
-					Songs
+		<Container>
+			<FormProvider key="fireStationForm" {...methods}>
+				<Typography variant="h5" gutterBottom>
+					{isCreateMode ? "Create" : "Edit"} Recommendation
 				</Typography>
-				<Grid container direction="row" justifyContent={"center"} spacing={2}>
-					{addSongRowButton}
-					{removeSongRowButton}
-				</Grid>
-				<Grid container direction="row" pt={4} px={2}>
-					{songs}
-				</Grid>
-				<Grid container direction="row">
-					<Grid item>
-						<Box mt={0} pt={2} pb={2}>
-							<LoadingButton
-								key="bcegsSubmit"
-								id="submit-form-btn"
-								type="submit"
-								color="primary"
-								variant="contained"
-								loading={showLoadingButton}
-								disabled={!isDirty || !isValid}
-							>
-								{isCreateMode ? "Create" : "Save"}
-							</LoadingButton>
-						</Box>
+				<Box key="bcegsFormBox" component="form" noValidate autoComplete="off" onSubmit={methods.handleSubmit(onFormSubmit)}>
+					<Grid container direction="row" spacing={2}>
+						<Grid item xs={6}>
+							<GenericTextItem
+								name="name"
+								label="Name"
+								id="name"
+								rules={{ required: "Name is required." }}
+								customControl={methods.control}
+								isLoading={isLoading}
+							/>
+						</Grid>
 					</Grid>
-				</Grid>
-				<DevTool control={methods.control} />
-			</Box>
-		</FormProvider>
+					<Grid container direction="row" spacing={2} py={1}>
+						<Grid item xs={12}>
+							<GenericTextItem
+								name="description"
+								label="Description"
+								id="description"
+								customControl={methods.control}
+								isLoading={isLoading}
+								multiline
+								fullWidth
+							/>
+						</Grid>
+					</Grid>
+					<Typography variant="h6" gutterBottom>
+						Songs
+					</Typography>
+					<Grid container direction="row" justifyContent={"center"} spacing={2}>
+						{addSongRowButton}
+						{removeSongRowButton}
+					</Grid>
+					<Grid container direction="row" py={2} px={2}>
+						<Grid item xs={6}>
+							<Typography variant="h6">Title</Typography>
+						</Grid>
+						<Grid item xs={6}>
+							<Typography variant="h6">Artist</Typography>
+						</Grid>
+						{songs}
+					</Grid>
+					<Grid container direction="row" mt={0} py={2}>
+						{submitButton}
+					</Grid>
+					<DevTool control={methods.control} />
+				</Box>
+			</FormProvider>
+		</Container>
 	);
 };
 
