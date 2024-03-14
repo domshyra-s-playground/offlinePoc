@@ -24,6 +24,7 @@ There are a few examples of how this project has progressed or the other technol
 ### Form Items
 Here are some of the Form items in this application that demo basic CRUD operations. 
 ![image](https://github.com/domshyra-s-playground/baseRtkQueryApp/assets/1061957/af09992e-464a-4a63-b311-ed4029557910)
+#### Form for adding a rec
 ![image](https://github.com/domshyra-s-playground/baseRtkQueryApp/assets/1061957/2995ed04-e2a6-4640-bcf9-dadffa310392)
 
 
