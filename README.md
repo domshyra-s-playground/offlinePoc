@@ -26,8 +26,7 @@ Here are some of the Form items in this application that demo basic CRUD operati
 ![image](https://github.com/domshyra-s-playground/baseRtkQueryApp/assets/1061957/2995ed04-e2a6-4640-bcf9-dadffa310392)
 
 #### Form for adding a rec
-![image](https://github.com/domshyra-s-playground/baseRtkQueryApp/assets/1061957/af09992e-464a-4a63-b311-ed4029557910)
-
+![image](https://github.com/domshyra-s-playground/baseRtkQueryApp/assets/1061957/bc9014bf-870c-4000-b7e8-c75d85126c21)
 
 
 ## Getting Started
