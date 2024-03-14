@@ -17,7 +17,11 @@ There are a few examples of how this project has progressed or the other technol
 [Here is a the upgrade to rtkQuery](https://github.com/domshyra-s-playground/rtkQueryDemo)
 
 
-# Screen shots 
+## Screen shots 
+### Basic spotify api interaction 
+![image](https://github.com/domshyra-s-playground/baseRtkQueryApp/assets/1061957/a8793cec-68bb-44fb-8237-6c2dee1e0b2b)
+
+### Form Items
 Here are some of the Form items in this application that demo basic CRUD operations. 
 ![image](https://github.com/domshyra-s-playground/baseRtkQueryApp/assets/1061957/af09992e-464a-4a63-b311-ed4029557910)
 ![image](https://github.com/domshyra-s-playground/baseRtkQueryApp/assets/1061957/2995ed04-e2a6-4640-bcf9-dadffa310392)
