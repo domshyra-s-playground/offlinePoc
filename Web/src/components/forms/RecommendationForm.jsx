@@ -52,7 +52,11 @@ const RecommendationForm = ({ setToast }) => {
 						setToast({ show: true, message: "Error saving recommendation.", isError: true });
 						return;
 					}
-					setToast({ show: true, message: "Recommendation saved.", link: `${recommendationsForm}${response.data.id}` });
+					setToast({
+						show: true,
+						message: isCreateMode ? "Recommendation created." : "Recommendation saved.",
+						link: `${recommendationsForm}${response.data.id}`,
+					});
 					navigate(recommendationsRoot);
 				})
 				.catch((error) => {
