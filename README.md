@@ -4,6 +4,7 @@
 
 Grabs spotify playlists based on appsettings `Spotify:Username` value.
 Has a form and index page to interact with.
+If you don't have a spotfiy dev account go [here](https://developer.spotify.com/documentation/web-api/tutorials/getting-started)
 
 Written in .Net and react
 
