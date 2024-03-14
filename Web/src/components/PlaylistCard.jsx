@@ -10,6 +10,7 @@ import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import OpenInSpotifyText from "./subcomponets/OpenInfSpotify";
 import { PropTypes } from "prop-types";
 import Typography from "@mui/material/Typography";
+import { playlistRoot } from "../constants/routes";
 import { renderHeart } from "./HeartRatings";
 import { useNavigate } from "react-router-dom";
 
@@ -31,7 +32,7 @@ const PlaylistCard = ({ title, imageURL, description, genre, trackAndFollowerTex
 						component="div"
 						variant="h6"
 						color="primary"
-						onClick={() => nav(`/playlist/${playlistId}`)}
+						onClick={() => nav(`${playlistRoot}/${playlistId}`)}
 					>
 						{title}
 					</Typography>

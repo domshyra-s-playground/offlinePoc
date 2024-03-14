@@ -2,7 +2,7 @@ import "./App.css";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Grid, IconButton, Link, Typography } from "@mui/material";
-import { recommendationsCreate, recommendationsForm, recommendationsRoot } from "../constants/routes";
+import { playlistRoot, recommendationsCreate, recommendationsForm, recommendationsRoot } from "../constants/routes";
 
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { Layout } from "./Layout";
@@ -21,7 +21,7 @@ function App() {
 					<Layout>
 						<Routes>
 							<Route path="/" element={<ViewPlaylists />} />
-							<Route path="/playlist/:playlistId" element={<PlaylistDetails />} />
+							<Route path={`${playlistRoot}/:playlistId`} element={<PlaylistDetails />} />
 							<Route path={recommendationsRoot} element={<ViewRecommendations />} />
 							<Route path={recommendationsCreate} element={<RecommendationForm />} />
 							<Route path={`${recommendationsForm}:id`} element={<RecommendationForm />} />
