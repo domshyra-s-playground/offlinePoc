@@ -6,11 +6,11 @@ import { playlistRoot, recommendationsCreate, recommendationsForm, recommendatio
 
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { Layout } from "./Layout";
-import PlaylistDetails from "../components/PlaylistDetails";
-import RecommendationForm from "../components/forms/RecommendationForm";
+import PlaylistDetails from "../components/playlists/PlaylistDetails";
+import RecommendationForm from "../components/recommendations/RecommendationForm";
 import StyledAppBar from "../components/StyledAppBar";
-import ViewPlaylists from "../components/ViewPlaylists";
-import ViewRecommendations from "../components/ViewRecommendations";
+import ViewPlaylists from "../components/playlists/ViewPlaylists";
+import ViewRecommendations from "../components/recommendations/ViewRecommendations";
 
 function App() {
 	return (

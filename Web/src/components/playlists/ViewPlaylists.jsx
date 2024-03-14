@@ -2,8 +2,8 @@ import { Box, Grid, Skeleton, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
 import PlaylistCard from "./PlaylistCardSelfFetching";
-import { useGetPlaylistsQuery } from "../redux/services/spotifyApi";
-import { useGetRatingsQuery } from "../redux/services/playlistRatingApi";
+import { useGetPlaylistsQuery } from "../../redux/services/spotifyApi";
+import { useGetRatingsQuery } from "../../redux/services/playlistRatingApi";
 
 const ViewPlaylists = () => {
 	const { data, isLoading } = useGetPlaylistsQuery();

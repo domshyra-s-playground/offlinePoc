@@ -2,14 +2,14 @@ import * as React from "react";
 
 import PlaylistCard from "./PlaylistCard";
 import { PropTypes } from "prop-types";
-import { playlistRatingApi } from "../redux/services/playlistRatingApi";
+import { playlistRatingApi } from "../../redux/services/playlistRatingApi";
 import { useEffect } from "react";
 import { useState } from "react";
 
 const PlaylistCardFromQueryState = (props) => {
 	const { playlistId } = props;
 	const [playlistRating, setPlaylistRating] = useState(null);
-	
+
 	//*This is the way
 	const { data: ratings, isLoading: ratingIsLoading } = playlistRatingApi.endpoints.getRatings.useQueryState();
 

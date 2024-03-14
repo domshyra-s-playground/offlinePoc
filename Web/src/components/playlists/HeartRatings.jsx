@@ -1,12 +1,12 @@
 import { IconButton, Rating, Skeleton } from "@mui/material";
-import { useAddRatingMutation, useDeleteRatingMutation, useUpdateRatingMutation } from "../redux/services/playlistRatingApi";
+import { useAddRatingMutation, useDeleteRatingMutation, useUpdateRatingMutation } from "../../redux/services/playlistRatingApi";
 
 import { Box } from "@mui/system";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import HeartBrokenIcon from "@mui/icons-material/HeartBroken";
 import { PropTypes } from "prop-types";
-import { isProdEnv } from "../config";
+import { isProdEnv } from "../../config";
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
 
@@ -96,14 +96,10 @@ function renderHeart(ratingIsLoading, title, playlistRating, playlistId) {
 		}
 
 		if (!ratingIsLoading) {
-			return (
-				<HeartRatings title={title} rating={playlistRating?.rating ?? 0} playlistId={playlistId} ratingId={playlistRating?.id} />
-			);
+			return <HeartRatings title={title} rating={playlistRating?.rating ?? 0} playlistId={playlistId} ratingId={playlistRating?.id} />;
 		}
-		return (
-			<Skeleton variant="rectangular" width={100} height={20} />
-		);
+		return <Skeleton variant="rectangular" width={100} height={20} />;
 	};
 }
 export default HeartRatings;
-export { HeartRatings, renderHeart}
+export { HeartRatings, renderHeart };

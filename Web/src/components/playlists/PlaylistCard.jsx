@@ -7,10 +7,10 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
-import OpenInSpotifyText from "./subcomponets/OpenInfSpotify";
+import OpenInSpotifyText from "../subcomponets/OpenInfSpotify";
 import { PropTypes } from "prop-types";
 import Typography from "@mui/material/Typography";
-import { playlistRoot } from "../constants/routes";
+import { playlistRoot } from "../../constants/routes";
 import { renderHeart } from "./HeartRatings";
 import { useNavigate } from "react-router-dom";
 

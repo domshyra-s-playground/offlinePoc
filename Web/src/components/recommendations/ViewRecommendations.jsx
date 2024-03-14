@@ -1,10 +1,10 @@
 import React, { useCallback } from "react";
-import { recommendationsCreate, recommendationsForm } from "../constants/routes";
-import { useDeleteRecommendationMutation, useGetRecommendationsQuery } from "../redux/services/playlistRecommendationApi";
+import { recommendationsCreate, recommendationsForm } from "../../constants/routes";
+import { useDeleteRecommendationMutation, useGetRecommendationsQuery } from "../../redux/services/playlistRecommendationApi";
 
-import StyledDataGrid from "./subcomponets/StyledDataGrid";
+import StyledDataGrid from "../subcomponets/StyledDataGrid";
 import { connect } from "react-redux";
-import { setToast } from "../redux/slices/toast";
+import { setToast } from "../../redux/slices/toast";
 
 const columns = [
 	{
