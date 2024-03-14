@@ -1,6 +1,6 @@
 import { Box, Button, Grid, Link, Typography } from "@mui/material";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
-import React, { forwardRef, useRef } from "react";
+import React, { forwardRef, useCallback, useMemo, useRef } from "react";
 import { alpha, styled } from "@mui/material/styles";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -77,57 +77,11 @@ function getHyperlinkUrl(hyperlinkUrl) {
 const StripedDataGridComponent = forwardRef((props, ref) => {
 	const { columns, hyperlinkColumnFieldName, singleton, rows, loading } = props;
 
-	function createHyperlinkColumn(hyperlinkUrl) {
-		const columnToHyperlink = getHyperlinkColumn();
-
-		if (!columnToHyperlink) {
-			//No match was made between the given field name and the column list supplied.
-			return null;
-		}
-
-		return {
-			field: columnToHyperlink.field,
-			headerName: columnToHyperlink.headerName,
-			filterable: columnToHyperlink.filterable ?? true,
-			sortable: columnToHyperlink.sortable ?? true,
-			flex: columnToHyperlink.flex,
-			type: columnToHyperlink.type,
-			renderCell: (cellValues) => {
-				return (
-					<Link component={RouterLink} to={`${getHyperlinkUrl(hyperlinkUrl)}${cellValues.row.id}`} underline="none">
-						<Typography id={`${singleton}-${cellValues.row.id}`} color="primary" display="inline" sx={{ fontWeight: "bold" }}>
-							{cellValues.row[hyperlinkColumnFieldName]}
-						</Typography>
-					</Link>
-				);
-			},
-		};
-	}
-
-	/**
-	 * Takes a GridColDef and searches the column prop for a GridColDef which matches the field property.
-	 * If the object is found then it is replaces with the passed parameter object.
-	 * (https://mui.com/x/api/data-grid/grid-col-def/)
-	 * @param columnToReplace
-	 * @returns {Object[]|unknown[]}
-	 */
-	function replaceHyperlinkColumn(columnToReplace) {
-		if (columns && hyperlinkColumnFieldName) {
-			return columns.map((column) => {
-				if (column.field === hyperlinkColumnFieldName) {
-					return columnToReplace;
-				} else {
-					return column;
-				}
-			});
-		}
-		return columns;
-	}
 	/**
 	 * Returns the column that has been indicated to be the hyperlink column.
 	 * @returns {Object|null}
 	 */
-	function getHyperlinkColumn() {
+	const getHyperlinkColumn = useCallback(() => {
 		if (columns && hyperlinkColumnFieldName) {
 			const hyperlinkColumn = columns.filter((column) => column.field === hyperlinkColumnFieldName)[0];
 			if (!hyperlinkColumn) {
@@ -137,7 +91,60 @@ const StripedDataGridComponent = forwardRef((props, ref) => {
 			return hyperlinkColumn;
 		}
 		return null;
-	}
+	}, [columns, hyperlinkColumnFieldName]);
+
+	const createHyperlinkColumn = useCallback(
+		(hyperlinkUrl) => {
+			const columnToHyperlink = getHyperlinkColumn();
+
+			if (!columnToHyperlink) {
+				//No match was made between the given field name and the column list supplied.
+				return null;
+			}
+
+			return {
+				field: columnToHyperlink.field,
+				headerName: columnToHyperlink.headerName,
+				filterable: columnToHyperlink.filterable ?? true,
+				sortable: columnToHyperlink.sortable ?? true,
+				flex: columnToHyperlink.flex,
+				type: columnToHyperlink.type,
+				renderCell: (cellValues) => {
+					return (
+						<Link component={RouterLink} to={`${getHyperlinkUrl(hyperlinkUrl)}${cellValues.row.id}`} underline="none">
+							<Typography id={`${singleton}-${cellValues.row.id}`} color="primary" display="inline" sx={{ fontWeight: "bold" }}>
+								{cellValues.row[hyperlinkColumnFieldName]}
+							</Typography>
+						</Link>
+					);
+				},
+			};
+		},
+		[getHyperlinkColumn, hyperlinkColumnFieldName, singleton]
+	);
+
+	/**
+	 * Takes a GridColDef and searches the column prop for a GridColDef which matches the field property.
+	 * If the object is found then it is replaces with the passed parameter object.
+	 * (https://mui.com/x/api/data-grid/grid-col-def/)
+	 * @param columnToReplace
+	 * @returns {Object[]|unknown[]}
+	 */
+	const replaceHyperlinkColumn = useCallback(
+		(columnToReplace) => {
+			if (columns && hyperlinkColumnFieldName) {
+				return columns.map((column) => {
+					if (column.field === hyperlinkColumnFieldName) {
+						return columnToReplace;
+					} else {
+						return column;
+					}
+				});
+			}
+			return columns;
+		},
+		[columns, hyperlinkColumnFieldName]
+	);
 
 	return (
 		<div
@@ -171,7 +178,7 @@ const StripedDataGridComponent = forwardRef((props, ref) => {
 
 const StyledDataGrid = (props) => {
 	const ref = useRef(null);
-	const { singleton, title, createPath } = props;
+	const { singleton, title, createPath, deleteAction } = props;
 	const createLabel = `Create ${props.singleton}`;
 
 	/**
@@ -196,24 +203,27 @@ const StyledDataGrid = (props) => {
 	 * @param {Object} cellValues - The values of the current cell.
 	 * @returns {JSX.Element}
 	 */
-	const deleteActionButton = (cellValues) => {
-		const title = `Delete ${singleton}`;
-		return (
-			<Button
-				id={`deleteRow-${cellValues.row.id}`}
-				variant="text"
-				color="primary"
-				onClick={() => {
-					props.deleteAction(cellValues.row.id);
-				}}
-				aria-label={title}
-				title={title}
-				startIcon={<DeleteIcon />}
-			/>
-		);
-	};
+	const deleteActionButton = useCallback(
+		(cellValues) => {
+			const title = `Delete ${singleton}`;
+			return (
+				<Button
+					id={`deleteRow-${cellValues.row.id}`}
+					variant="text"
+					color="primary"
+					onClick={() => {
+						deleteAction(cellValues.row.id);
+					}}
+					aria-label={title}
+					title={title}
+					startIcon={<DeleteIcon />}
+				/>
+			);
+		},
+		[deleteAction, singleton]
+	);
 
-	const header = () => {
+	const header = useMemo(() => {
 		return (
 			<Box pb={1} mb={1}>
 				<Grid container direction="row" alignItems="center">
@@ -239,10 +249,10 @@ const StyledDataGrid = (props) => {
 				</Grid>
 			</Box>
 		);
-	};
+	}, [createLabel, createPath, singleton, title]);
 	return (
 		<Box mb={2} pb={2}>
-			{header()}
+			{header}
 			<StripedDataGridComponent {...props} columns={[...props.columns, actionButtonsColumnDefinition]} ref={ref} />
 		</Box>
 	);
