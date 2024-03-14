@@ -31,6 +31,8 @@ Here are some of the Form items in this application that demo basic CRUD operati
 
 
 ## Getting Started
+I recommend using VS Code and opening the API folder and the Web folder each in seprate vs code instances. 
+
 
 ### API
 First navigate to the api folder
