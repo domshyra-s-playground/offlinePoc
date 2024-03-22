@@ -1,5 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
+import connectionStatus from "./slices/connectionStatus";
 import { playlistRatingApi } from "./services/playlistRatingApi";
 import { playlistRecommendationApi } from "./services/playlistRecommendationApi";
 import { spotifyApi } from "./services/spotifyApi";
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
 	[playlistRatingApi.reducerPath]: playlistRatingApi.reducer,
 	[playlistRecommendationApi.reducerPath]: playlistRecommendationApi.reducer,
 	toast,
+	connectionStatus,
 });
 
 const setupStore = (preloadedState) => {

@@ -15,7 +15,10 @@ import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
 
-const RecommendationForm = ({ setToast }) => {
+// import { useBeforeUnload } from "react-router-dom";
+
+
+const RecommendationForm = ({ setToast, online }) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
 	const [songRows, setSongRows] = useState(0);
 	const navigate = useNavigate();
@@ -27,6 +30,7 @@ const RecommendationForm = ({ setToast }) => {
 	const {
 		formState: { isDirty, isValid },
 	} = methods;
+
 	const { id } = params;
 	const isCreateMode = id === undefined;
 
@@ -35,12 +39,16 @@ const RecommendationForm = ({ setToast }) => {
 
 	const [upsertRecommendation] = useUpsertRecommendationMutation();
 
-	useEffect(() => {
-		if (data) {
-			methods.reset(data, { keepIsValid: false });
-			setSongRows(data?.suggestions?.length ?? 0);
-		}
-	}, [methods.reset, data, methods]);
+	// //https://reactrouter.com/en/main/hooks/use-blocker
+	// //!https://reactrouter.com/en/main/hooks/use-blocker#:~:text=Blocking%20a%20user,from%20navigating%20away.
+	// let blocker = useBlocker(() => isDirty && !online);
+
+	// useEffect(() => {
+	// 	if (data) {
+	// 		methods.reset(data, { keepIsValid: false });
+	// 		setSongRows(data?.suggestions?.length ?? 0);
+	// 	}
+	// }, [methods.reset, data, methods]);
 
 	/**
 	 * Save the record
@@ -146,6 +154,22 @@ const RecommendationForm = ({ setToast }) => {
 	}, [songRows]);
 
 	const submitButton = useMemo(() => {
+		const btnText = () => {
+			if (!online) {
+				return "Offline";
+			}
+			if (isCreateMode) {
+				return "Create";
+			}
+			return "Save";
+		};
+		const btnDisabled = () => {
+			if (!online) {
+				return true;
+			}
+			return !isDirty || !isValid;
+		};
+
 		return (
 			<LoadingButton
 				key="bcegsSubmit"
@@ -154,15 +178,22 @@ const RecommendationForm = ({ setToast }) => {
 				color="primary"
 				variant="contained"
 				loading={showLoadingButton}
-				disabled={!isDirty || !isValid}
+				disabled={btnDisabled()}
 			>
-				{isCreateMode ? "Create" : "Save"}
+				{btnText()}
 			</LoadingButton>
 		);
-	}, [isCreateMode, isDirty, isValid, showLoadingButton]);
+	}, [isCreateMode, isDirty, isValid, online, showLoadingButton]);
 
 	return (
 		<Container>
+			{/* {blocker.state === "blocked" ? (
+				<div>
+					<p>Are you sure you want to leave?</p>
+					<button onClick={() => blocker.proceed()}>Proceed</button>
+					<button onClick={() => blocker.reset()}>Cancel</button>
+				</div>
+			) : null} */}
 			<FormProvider key="fireStationForm" {...methods}>
 				<Typography variant="h5" gutterBottom>
 					{isCreateMode ? "Create" : "Edit"} Recommendation
@@ -231,8 +262,10 @@ const RecommendationForm = ({ setToast }) => {
 	);
 };
 
-function mapStateToProps() {
-	return {};
+function mapStateToProps(state) {
+	return {
+		online: state.connectionStatus.online,
+	};
 }
 
 const mapDispatchToProps = {

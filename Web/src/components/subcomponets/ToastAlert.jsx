@@ -45,7 +45,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(ToastAlert);
 
 ToastAlert.propTypes = {
 	show: PropTypes.bool.isRequired,
-	isError: PropTypes.bool.isRequired,
+	isError: PropTypes.bool,
 	displaySeverity: PropTypes.string,
 	message: PropTypes.string.isRequired,
 	link: PropTypes.string,

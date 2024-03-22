@@ -5,6 +5,7 @@ import { useDeleteRecommendationMutation, useGetRecommendationsQuery } from "../
 import StyledDataGrid from "../subcomponets/StyledDataGrid";
 import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
+import { useGetGenresQuery } from "../../redux/services/spotifyApi";
 
 const ViewRecommendations = ({ setToast }) => {
 	const { data, isLoading } = useGetRecommendationsQuery();
@@ -18,6 +19,8 @@ const ViewRecommendations = ({ setToast }) => {
 		[deleteRecommendation, setToast]
 	);
 
+	//Grab the genres from the Spotify API for offline use
+	useGetGenresQuery();
 	return (
 		<StyledDataGrid
 			columns={columns}

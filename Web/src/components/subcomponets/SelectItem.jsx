@@ -96,6 +96,6 @@ SelectItem.propTypes = {
 	id: PropTypes.string.isRequired,
 	label: PropTypes.string,
 	description: PropTypes.string,
-	options: PropTypes.array.isRequired,
+	options: PropTypes.array,
 	disabled: PropTypes.bool,
 };
