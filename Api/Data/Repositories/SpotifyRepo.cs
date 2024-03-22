@@ -6,16 +6,17 @@ using System.Net;
 using System.Text;
 using System.Web;
 
-namespace Providers
+namespace Repositories
 {
     /// <inheritdoc/>
-    public class SpotifyProvider : ISpotifyProvider
+    public class SpotifyRepo : ISpotifyRepo
     {
         private readonly IConfiguration _configuration;
         private readonly string _username;
 
+
         /// <inheritdoc/>
-        public SpotifyProvider(IConfiguration Configuration)
+        public SpotifyRepo(IConfiguration Configuration)
         {
             _configuration = Configuration;
             _username = _configuration["Spotify:Username"];
@@ -37,7 +38,48 @@ namespace Providers
 
             return await GetPlaylistInfoAsync(playlistId, authToken);
         }
-        
+
+        public async Task<List<string>> GetGenres()
+        {
+            string authToken = GetAuthToken();
+
+            return await GetGenresAsync(authToken);
+        }
+
+        private static async Task<List<string>> GetGenresAsync(string authToken)
+        {
+            string baseUrl = $"https://api.spotify.com/v1/recommendations/available-genre-seeds";
+            try
+            {
+                using HttpClient client = new();
+                //add the spotify auth 
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authToken}");
+
+                using HttpResponseMessage res = await client.GetAsync(baseUrl);
+                using HttpContent content = res.Content;
+                string data = await content.ReadAsStringAsync();
+
+                if (data != null)
+                {
+                    var spotifyGenres = JsonConvert.DeserializeObject<SpotifyGenres>(data);
+                    return spotifyGenres?.Genres.OrderBy(item => item).ToList() ?? new List<string>();
+                }
+                else
+                {
+                    Console.WriteLine("NO Data----------");
+                }
+            }
+
+            catch (Exception exception)
+            {
+                Console.WriteLine("Exception Hit------------");
+                Console.WriteLine(exception);
+            }
+
+            return new List<string>();
+
+        }
+
         private async Task<List<string>> GetPlaylistIds(string authToken)
         {
             string baseUrl = $"https://api.spotify.com/v1/users/{_username}/playlists?limit=40";
@@ -60,7 +102,7 @@ namespace Providers
                     SpotifyPlaylists playlists = JsonConvert.DeserializeObject<SpotifyPlaylists>(data);
 
                     //I only want to display public playlists by me
-                    return playlists.items.ToList()
+                    return playlists.Items.ToList()
                         .Where(x => string.Equals(x.owner.display_name, _username, StringComparison.OrdinalIgnoreCase) && x.@public)
                         .Select(x => x.id).ToList();
                 }
@@ -102,7 +144,7 @@ namespace Providers
                     SpotifyPlaylists playlists = JsonConvert.DeserializeObject<SpotifyPlaylists>(data);
 
                     //I only want to display public playlists by me
-                    List<PlaylistsModel> playlistsModels = playlists.items.ToList()
+                    List<PlaylistsModel> playlistsModels = playlists.Items.ToList()
                         .Where(x => string.Equals(x.owner.display_name, _username, StringComparison.OrdinalIgnoreCase) && x.@public)
                         .Select(playlist => new PlaylistsModel()
                         {
@@ -114,7 +156,7 @@ namespace Providers
                             SpotifyMusicLink = playlist.external_urls.spotify
                         }).ToList();
 
-                    
+
                     foreach (PlaylistsModel playlistModel in playlistsModels)
                     {
                         SetDescriptionAndGenre(playlistModel);
@@ -158,6 +200,8 @@ namespace Providers
             }
         }
 
+
+        //!Note: this would be cached in a real world scenario and we would want to call the refresh token if the token expired
         /// <summary>
         /// Get the auth token for my queries since a user isn't authenticating it 
         /// </summary>
@@ -268,5 +312,7 @@ namespace Providers
 
             return null;
         }
+
+
     }
 }

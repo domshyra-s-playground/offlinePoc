@@ -1,8 +1,9 @@
 using Interfaces;
-using Providers;
+using Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.ApplicationInsights;
+using Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +17,9 @@ builder.Services.AddCors();
 builder.Services.AddDbContext<PlaylistDbContext>(options =>
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
-builder.Services.AddApplicationInsightsTelemetry(); 
+builder.Services.AddApplicationInsightsTelemetry();
 
-builder.Services.AddScoped<ISpotifyProvider, SpotifyProvider>();
+builder.Services.AddScoped<ISpotifyRepo, SpotifyRepo>();
 builder.Services.AddScoped<IPlaylistRepo, PlaylistRepo>();
 builder.Services.AddScoped<IRecommendationRepo, RecommendationRepo>();
 
@@ -51,17 +52,22 @@ app.Run();
 
 static void UseSpotifyPlaylistRoutes(WebApplication app)
 {
-    app.MapGet("/spotify", async (ISpotifyProvider _spotifyProvider) =>
+    app.MapGet("/spotify", async (ISpotifyRepo _spotifyProvider) =>
     {
         app.Logger.LogInformation("Getting playlists");
         return await _spotifyProvider.GetPlaylists();
     }).WithName("GetSpotifyPlaylists").WithTags("Spotify");
 
-    app.MapGet("/spotify/{playlistId}", async (string playlistId, ISpotifyProvider _spotifyProvider) =>
+    app.MapGet("/spotify/{playlistId}", async (string playlistId, ISpotifyRepo _spotifyProvider) =>
     {
         app.Logger.LogInformation($"Getting playlist with id {playlistId}");
         return await _spotifyProvider.GetPlaylist(playlistId);
     }).WithName("GetSpotifyPlaylist").WithTags("Spotify");
+
+    app.MapGet("/spotify/genres", async (ISpotifyRepo _spotifyProvider) =>
+    {
+        return await _spotifyProvider.GetGenres();
+    }).WithName("GetSpotifyGenres").WithTags("Spotify");
 }
 
 static void UseRatingsRoutes(WebApplication app)

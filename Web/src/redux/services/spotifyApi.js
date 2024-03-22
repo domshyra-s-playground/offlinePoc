@@ -13,15 +13,18 @@ export const spotifyApi = createApi({
 	endpoints: (build) => ({
 		getPlaylists: build.query({
 			query: () => ``,
-			providesTags: (result) =>
-				result ? [...result.map(({ playlistId }) => ({ type: tagType, playlistId })), tagType] : [tagType],
+			providesTags: (result) => (result ? [...result.map(({ playlistId }) => ({ type: tagType, playlistId })), tagType] : [tagType]),
 		}),
 		getPlaylist: build.query({
 			query: (playlistId) => `/${playlistId}`,
 			providesTags: (_result, _err, playlistId) => [{ type: tagType, playlistId }],
 		}),
+		getGenres: build.query({
+			query: () => `/genres`,
+			providesTags: (result) => (result ? [{ type: tagType }] : [tagType]),
+		}),
 	}),
 	tagTypes: [tagType],
 });
 
-export const { useGetPlaylistsQuery, useGetPlaylistQuery } = spotifyApi;
+export const { useGetPlaylistsQuery, useGetPlaylistQuery, useGetGenresQuery } = spotifyApi;

@@ -7,7 +7,7 @@ namespace Interfaces
     /// <summary>
     /// Provides methods to query Spotify
     /// </summary>
-    public interface ISpotifyProvider
+    public interface ISpotifyRepo
     {
         /// <summary>
         /// Gets playlists from Spotify
@@ -21,5 +21,11 @@ namespace Interfaces
         /// <param name="playlistId"></param>
         /// <returns></returns>
         Task<PlaylistsModel> GetPlaylist(string playlistId);
+
+        /// <summary>
+        /// Returns a list of genres
+        /// </summary>
+        /// <returns>
+        Task<List<string>> GetGenres();
     }
 }

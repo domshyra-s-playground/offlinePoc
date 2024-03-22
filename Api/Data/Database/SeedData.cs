@@ -1,15 +1,20 @@
+using Entities;
 using Microsoft.EntityFrameworkCore;
 
-public static class SeedData
+namespace Database
 {
-    public static void Seed(ModelBuilder builder)
+    public static class SeedData
     {
-        builder.Entity<PlaylistRatingEntity>().HasData(new List<PlaylistRatingEntity> {
+        public static void Seed(ModelBuilder builder)
+        {
+            builder.Entity<PlaylistRatingEntity>().HasData(new List<PlaylistRatingEntity> {
             new PlaylistRatingEntity {
                 Id = new Guid("cc89279a-1ebb-49c3-9a0d-f704c61b5d0a"),
                 Rating = 5,
                 PlaylistId = "4wPdda9xSZy2ffI47Bo696"
             },
         });
+        }
     }
+
 }
