@@ -6,27 +6,6 @@ import StyledDataGrid from "../subcomponets/StyledDataGrid";
 import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
 
-const columns = [
-	{
-		field: "name",
-		headerName: "Name",
-		flex: 3,
-		type: "string",
-	},
-	{
-		field: "description",
-		headerName: "Description",
-		flex: 3,
-		type: "string",
-	},
-	{
-		field: "genre",
-		headerName: "Genre",
-		flex: 3,
-		type: "string",
-	},
-];
-
 const ViewRecommendations = ({ setToast }) => {
 	const { data, isLoading } = useGetRecommendationsQuery();
 	const [deleteRecommendation] = useDeleteRecommendationMutation();
@@ -60,5 +39,26 @@ function mapStateToProps() {
 const mapDispatchToProps = {
 	setToast,
 };
+const columns = [
+	{
+		field: "name",
+		headerName: "Name",
+		flex: 3,
+		type: "string",
+	},
+	{
+		field: "description",
+		headerName: "Description",
+		flex: 3,
+		type: "string",
+	},
+	{
+		field: "genre",
+		headerName: "Genre",
+		flex: 3,
+		type: "string",
+	},
+];
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewRecommendations);

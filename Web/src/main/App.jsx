@@ -7,10 +7,10 @@ import { playlistRoot, recommendationsCreate, recommendationsForm, recommendatio
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { Layout } from "./Layout";
 import PlaylistDetails from "../components/playlists/PlaylistDetails";
-import RecommendationForm from "../components/recommendations/RecommendationForm";
+import RecommendationForm from "../components/recommendations/Form";
 import StyledAppBar from "../components/StyledAppBar";
 import ViewPlaylists from "../components/playlists/ViewPlaylists";
-import ViewRecommendations from "../components/recommendations/ViewRecommendations";
+import ViewRecommendations from "../components/recommendations/View";
 
 function App() {
 	return (
