@@ -1,9 +1,9 @@
 import { Box, Button, Container, Grid, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { recommendationsForm, recommendationsRoot } from "../../constants/routes";
+import { useBlocker, useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGetRecommendationQuery, useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
-import { useNavigate, useParams } from "react-router-dom";
 
 import AddIcon from "@mui/icons-material/Add";
 import { DevTool } from "@hookform/devtools";
@@ -13,10 +13,8 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import SelectItem from "../subcomponets/SelectItem";
 import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
+import { useBeforeUnload } from "react-router-dom";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
-
-// import { useBeforeUnload } from "react-router-dom";
-
 
 const RecommendationForm = ({ setToast, online }) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
@@ -39,16 +37,16 @@ const RecommendationForm = ({ setToast, online }) => {
 
 	const [upsertRecommendation] = useUpsertRecommendationMutation();
 
-	// //https://reactrouter.com/en/main/hooks/use-blocker
-	// //!https://reactrouter.com/en/main/hooks/use-blocker#:~:text=Blocking%20a%20user,from%20navigating%20away.
-	// let blocker = useBlocker(() => isDirty && !online);
+	//https://reactrouter.com/en/main/hooks/use-blocker
+	//!https://reactrouter.com/en/main/hooks/use-blocker#:~:text=Blocking%20a%20user,from%20navigating%20away.
+	let blocker = useBlocker(() => isDirty && !online);
 
-	// useEffect(() => {
-	// 	if (data) {
-	// 		methods.reset(data, { keepIsValid: false });
-	// 		setSongRows(data?.suggestions?.length ?? 0);
-	// 	}
-	// }, [methods.reset, data, methods]);
+	useEffect(() => {
+		if (data) {
+			methods.reset(data, { keepIsValid: false });
+			setSongRows(data?.suggestions?.length ?? 0);
+		}
+	}, [methods.reset, data, methods]);
 
 	/**
 	 * Save the record
@@ -187,13 +185,13 @@ const RecommendationForm = ({ setToast, online }) => {
 
 	return (
 		<Container>
-			{/* {blocker.state === "blocked" ? (
+			{blocker.state === "blocked" ? (
 				<div>
 					<p>Are you sure you want to leave?</p>
 					<button onClick={() => blocker.proceed()}>Proceed</button>
 					<button onClick={() => blocker.reset()}>Cancel</button>
 				</div>
-			) : null} */}
+			) : null}
 			<FormProvider key="fireStationForm" {...methods}>
 				<Typography variant="h5" gutterBottom>
 					{isCreateMode ? "Create" : "Edit"} Recommendation
