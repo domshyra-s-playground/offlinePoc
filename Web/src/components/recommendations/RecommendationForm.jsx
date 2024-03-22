@@ -10,8 +10,10 @@ import { DevTool } from "@hookform/devtools";
 import GenericTextItem from "../subcomponets/GenericTextItem";
 import { LoadingButton } from "@mui/lab";
 import RemoveIcon from "@mui/icons-material/Remove";
+import SelectItem from "../subcomponets/SelectItem";
 import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
+import { useGetGenresQuery } from "../../redux/services/spotifyApi";
 
 const RecommendationForm = ({ setToast }) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
@@ -29,6 +31,8 @@ const RecommendationForm = ({ setToast }) => {
 	const isCreateMode = id === undefined;
 
 	const { data, isLoading } = useGetRecommendationQuery(id, { skip: isCreateMode });
+	const { data: genres, isLoading: genresAreLoading } = useGetGenresQuery();
+
 	const [upsertRecommendation] = useUpsertRecommendationMutation();
 
 	useEffect(() => {
@@ -173,6 +177,18 @@ const RecommendationForm = ({ setToast }) => {
 								rules={{ required: "Name is required." }}
 								customControl={methods.control}
 								isLoading={isLoading}
+							/>
+						</Grid>
+						<Grid item xs={6}>
+							<SelectItem
+								name="genre"
+								label="Genre"
+								id="genre"
+								showLabel
+								rules={{ required: "Genre is required." }}
+								customControl={methods.control}
+								isLoading={genresAreLoading}
+								options={genres}
 							/>
 						</Grid>
 					</Grid>

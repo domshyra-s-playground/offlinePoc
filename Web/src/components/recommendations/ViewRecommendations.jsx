@@ -19,6 +19,12 @@ const columns = [
 		flex: 3,
 		type: "string",
 	},
+	{
+		field: "genre",
+		headerName: "Genre",
+		flex: 3,
+		type: "string",
+	},
 ];
 
 const ViewRecommendations = ({ setToast }) => {

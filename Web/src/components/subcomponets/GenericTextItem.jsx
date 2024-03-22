@@ -1,6 +1,6 @@
 import { Controller, useForm } from "react-hook-form";
 import { InputAdornment, Skeleton, Stack, TextField, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 import PropTypes from "prop-types";
 import { isSafeNumberValue } from "../../tools/numbers";
