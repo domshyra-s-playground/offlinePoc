@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 using Database;
+using Microsoft.EntityFrameworkCore.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllersWithViews();
 //TODO remove
 builder.Services.AddCors();
+// Add this using directive
+
 builder.Services.AddDbContext<PlaylistDbContext>(options =>
 {
     if (builder.Environment.IsDevelopment())
@@ -25,7 +28,7 @@ builder.Services.AddDbContext<PlaylistDbContext>(options =>
     }
     else
     {
-        options.UseSqlite(builder.Configuration.GetConnectionString("PlaylistDb"));
+        options.UseSqlServer(builder.Configuration.GetConnectionString("PlaylistDb"));
     }
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
