@@ -34,7 +34,10 @@ jobs:
         
       
       - name: Add database with dotnet
-        run: dotnet ef database update
+        run: |
+          dotnet tool install --global dotnet-ef
+          dotnet tool restore
+          dotnet ef database update
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Api
