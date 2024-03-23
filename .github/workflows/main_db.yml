@@ -10,6 +10,7 @@ on:
     paths:
       - Api/Data/**
       - Api/Migrations/**
+      - .github/workflows/main_db.yml
   workflow_dispatch:
 
 # https://learn.microsoft.com/en-us/azure/azure-sql/database/connect-github-actions-sql-db?view=azuresql&tabs=userlevel
