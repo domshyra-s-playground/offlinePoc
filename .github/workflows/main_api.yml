@@ -35,7 +35,7 @@ jobs:
       - name: App Settings Variable Substitution
         uses: microsoft/variable-substitution@v1
         with:
-          files: '${{env.DOTNET_ROOT}}/Api/appsettings.json'
+          files: 'D:\a\offlinePoc\offlinePoc\Api\appsettings.json'
         env:
           ConnectionStrings.PlaylistDB: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
 
