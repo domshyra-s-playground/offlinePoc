@@ -1,4 +1,4 @@
-[![Web](https://github.com/domshyra-s-playground/offlinePoc/actions/workflows/main_web.yml/badge.svg)](https://github.com/domshyra-s-playground/offlinePoc/actions/workflows/main_web.yml) [![Api](https://github.com/domshyra-s-playground/offlinePoc/actions/workflows/main_api.yml/badge.svg)](https://github.com/domshyra-s-playground/offlinePoc/actions/workflows/main_api.yml)
+[![Web](https://github.com/domshyra-s-playground/offlinePoc/actions/workflows/main_web.yml/badge.svg)](https://github.com/domshyra-s-playground/offlinePoc/actions/workflows/main_web.yml) [![Api](https://github.com/domshyra-s-playground/offlinePoc/actions/workflows/main_api.yml/badge.svg)](https://github.com/domshyra-s-playground/offlinePoc/actions/workflows/main_api.yml) [![Db](https://github.com/domshyra-s-playground/offlinePoc/actions/workflows/main_db.yml/badge.svg)](https://github.com/domshyra-s-playground/offlinePoc/actions/workflows/main_db.yml)
 
 # Basic Spa app with RtkQuery, React hook forms, and a .net backend
 
