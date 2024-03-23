@@ -15,7 +15,21 @@ builder.Services.AddControllersWithViews();
 //TODO remove
 builder.Services.AddCors();
 builder.Services.AddDbContext<PlaylistDbContext>(options =>
-    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+{
+    if (builder.Environment.IsDevelopment())
+    {
+
+        var folder = Environment.SpecialFolder.LocalApplicationData;
+        var path = Environment.GetFolderPath(folder);
+        options.UseSqlite($"Data Source={Path.Join(path, "playlist.db")}");
+    }
+    else
+    {
+        options.UseSqlite(builder.Configuration.GetConnectionString("PlaylistDb"));
+    }
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
+
 
 builder.Services.AddApplicationInsightsTelemetry();
 

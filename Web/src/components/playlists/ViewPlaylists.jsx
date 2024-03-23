@@ -27,6 +27,7 @@ const ViewPlaylists = () => {
 		));
 	};
 
+	//TODO! the view is now a bit off center, need to fix that since adding container
 	return (
 		<>
 			<Box sx={{ justifyContent: "center" }}>
