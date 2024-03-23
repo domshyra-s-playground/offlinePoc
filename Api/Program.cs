@@ -26,9 +26,13 @@ builder.Services.AddDbContext<PlaylistDbContext>(options =>
         var path = Environment.GetFolderPath(folder);
         options.UseSqlite($"Data Source={Path.Join(path, "playlist.db")}");
     }
-    else
+    else if (builder.Environment.IsProduction())
     {
         options.UseSqlServer(builder.Configuration.GetConnectionString("PlaylistDb"));
+    }
+    else
+    {
+        throw new Exception("Env not specified");
     }
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });

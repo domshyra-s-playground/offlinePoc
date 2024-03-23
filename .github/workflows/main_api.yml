@@ -11,6 +11,7 @@ on:
       - Api/**
   workflow_dispatch:
 
+# https://learn.microsoft.com/en-us/azure/azure-sql/database/connect-github-actions-sql-db?view=azuresql&tabs=userlevel
 jobs:
   build:
     runs-on: windows-latest
@@ -22,6 +23,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - run: ls
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
@@ -37,7 +42,7 @@ jobs:
         run: |
           dotnet tool install --global dotnet-ef --version 6.0.28 
           dotnet tool restore
-          dotnet ef database update --connection '${{ secrets.DBConnection }}'
+          dotnet ef database update --connection '${{ secrets.AZURE_SQL_CONNECTION_STRING }}'
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Api

@@ -18,12 +18,6 @@ namespace Database
         public DbSet<PlaylistRecommendationEntity> Recommendations => Set<PlaylistRecommendationEntity>();
         public DbSet<SongEntity> Songs => Set<SongEntity>();
 
-        // protected override void OnConfiguring(DbContextOptionsBuilder options, )
-        // {
-        //     var folder = Environment.SpecialFolder.LocalApplicationData;
-        //     var path = Environment.GetFolderPath(folder);
-        //     options.UseSqlite($"Data Source={Path.Join(path, "playlist.db")}");
-        // }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

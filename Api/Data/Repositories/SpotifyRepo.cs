@@ -99,7 +99,7 @@ namespace Repositories
                     dynamic playlistHeader = JObject.Parse(data);
 
                     //lets get these items into a list I can parse
-                    SpotifyPlaylists playlists = JsonConvert.DeserializeObject<SpotifyPlaylists>(data);
+                    SpotifyPlaylists playlists = JsonConvert.DeserializeObject<SpotifyPlaylists>(data) ?? throw new NullReferenceException("Playlists are null");
 
                     //I only want to display public playlists by me
                     return playlists.Items.ToList()
@@ -250,7 +250,7 @@ namespace Repositories
                     //should get back a string i can then turn to json and parse for accesstoken
                     string json = rdr.ReadToEnd();
 
-                    authToken = JsonConvert.DeserializeObject<SpotifyAuth>(json).access_token;
+                    authToken = JsonConvert.DeserializeObject<SpotifyAuth>(json)?.access_token ?? throw new NullReferenceException("Access token is null");
 
                     rdr.Close();
                 }
