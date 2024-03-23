@@ -11,15 +11,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Api.Migrations
 {
     [DbContext(typeof(PlaylistDbContext))]
-    [Migration("20240313202932_Songs")]
-    partial class Songs
+    [Migration("20240323233714_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.28");
 
-            modelBuilder.Entity("PlaylistRatingEntity", b =>
+            modelBuilder.Entity("Entities.PlaylistRatingEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -48,13 +48,17 @@ namespace Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("PlaylistRecommendationEntity", b =>
+            modelBuilder.Entity("Entities.PlaylistRecommendationEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Genre")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -67,7 +71,7 @@ namespace Api.Migrations
                     b.ToTable("Recommendations");
                 });
 
-            modelBuilder.Entity("SongEntity", b =>
+            modelBuilder.Entity("Entities.SongEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,9 +95,9 @@ namespace Api.Migrations
                     b.ToTable("Songs");
                 });
 
-            modelBuilder.Entity("SongEntity", b =>
+            modelBuilder.Entity("Entities.SongEntity", b =>
                 {
-                    b.HasOne("PlaylistRecommendationEntity", "PlaylistRecommendationEntity")
+                    b.HasOne("Entities.PlaylistRecommendationEntity", "PlaylistRecommendationEntity")
                         .WithMany("Suggestions")
                         .HasForeignKey("PlaylistRecommendationEntityId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -102,7 +106,7 @@ namespace Api.Migrations
                     b.Navigation("PlaylistRecommendationEntity");
                 });
 
-            modelBuilder.Entity("PlaylistRecommendationEntity", b =>
+            modelBuilder.Entity("Entities.PlaylistRecommendationEntity", b =>
                 {
                     b.Navigation("Suggestions");
                 });
