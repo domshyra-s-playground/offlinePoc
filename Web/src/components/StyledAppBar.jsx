@@ -10,6 +10,7 @@ import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import { Link as RouterLink } from "react-router-dom";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import { recommendationsRoot } from "../constants/routes";
 
 const StyledAppBar = () => {
 	//for hamgurger menu
@@ -79,6 +80,11 @@ const StyledAppBar = () => {
 					<Link underline="none" to="/" component={RouterLink} color="white">
 						<Typography variant="h6" noWrap component="div" sx={{ display: { xs: "none", sm: "block" } }}>
 							Playlists
+						</Typography>
+					</Link>
+					<Link underline="none" to={`${recommendationsRoot}/`} component={RouterLink} color="white" px={2}>
+						<Typography variant="h6" noWrap component="div" sx={{ display: { xs: "none", sm: "block" } }}>
+							Recommendations
 						</Typography>
 					</Link>
 					<Box sx={{ flexGrow: 1 }} />

@@ -23,14 +23,14 @@ function Layout({ status: { online, onlineAt, offlineAt } }) {
 					</Grid>
 					<Grid container justifyContent="center" pb={2}>
 						<Grid item xs={12}>
-							<IconButton title="view code on github" href="https://github.com/domshyra/domshyra" target="_blank">
+							<IconButton title="view code on github" href="https://github.com/domshyra-s-playground/offlinePoc" target="_blank">
 								<GitHubIcon />
 							</IconButton>
 						</Grid>
 						<Grid item xs={12}>
 							<Typography component="div" variant="caption" color="text.secondary" align="center">
 								View this code on{" "}
-								<Link rel="noopener" target="_blank" href="https://github.com/domshyra/domshyra" underline="none">
+								<Link rel="noopener" target="_blank" href="https://github.com/domshyra-s-playground/offlinePoc" underline="none">
 									GitHub
 								</Link>
 							</Typography>
