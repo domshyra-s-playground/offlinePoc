@@ -9,6 +9,7 @@ on:
       - main
     paths:
       - Web/**
+      - .github/workflows/main_web.yml
   workflow_dispatch:
 
 jobs:
