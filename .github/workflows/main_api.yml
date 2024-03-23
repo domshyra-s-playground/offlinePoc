@@ -33,7 +33,8 @@ jobs:
         run: dotnet build --configuration Release
         
       
-      
+      - name: Add database with dotnet
+        run: dotnet ef database update
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Api
