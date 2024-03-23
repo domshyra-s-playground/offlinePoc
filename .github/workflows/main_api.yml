@@ -42,7 +42,7 @@ jobs:
         run: |
           dotnet tool install --global dotnet-ef --version 6.0.28 
           dotnet tool restore
-          dotnet ef database update --connection '${{ secrets.AZURE_SQL_CONNECTION_STRING }}'
+          dotnet ef database update --connection '${{ secrets.AZURE_SQL_CONNECTION_STRING }}' -- --environment Production
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Api
