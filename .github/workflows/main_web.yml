@@ -54,12 +54,14 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: node-app
-        
+
+      # https://learn.microsoft.com/en-us/azure/app-service/deploy-continuous-deployment?tabs=github%2Cgithubactions#configure-the-deployment-source
+      # https://learn.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel%2Caspnetcore
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
         with:
           app-name: 'offlinePocWeb'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A3E239081C9F4FA19DD3F53F6F308C32 }}
+          publish-profile: ${{ secrets.AZURE_APPSERVICE_PUBLISH_PROFILE_WEB }}
           package: D:\a\offlinePoc\offlinePoc\release.zip

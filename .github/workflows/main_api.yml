@@ -57,11 +57,13 @@ jobs:
         with:
           name: .net-app
 
+      # https://learn.microsoft.com/en-us/azure/app-service/deploy-continuous-deployment?tabs=github%2Cgithubactions#configure-the-deployment-source
+      # https://learn.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel%2Caspnetcore
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'offlinePocApi'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_08B451120E234EFDA3F0B6BF9271533D }}
+          publish-profile: ${{ secrets.AZURE_APPSERVICE_PUBLISH_PROFILE_API }}
           package: .
