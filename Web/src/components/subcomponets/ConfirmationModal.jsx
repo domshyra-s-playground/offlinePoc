@@ -23,16 +23,16 @@ const ConfirmationModal = ({
 	disableConfirmationButton = false,
 }) => {
 	const [show, setShow] = useState(showModal);
-	const [errorOnAction, setErrorOnAction] = useState(false);
+	// const [errorOnAction, setErrorOnAction] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const confirm = () => {
 		setLoading(true);
 		confirmAction()
 			.then(() => {
-				setErrorOnAction(false);
+				// setErrorOnAction(false);
 			})
 			.catch(() => {
-				setErrorOnAction(true);
+				// setErrorOnAction(true);
 			})
 			.finally(() => {
 				setLoading(false);
