@@ -1,4 +1,4 @@
-import { Box, Button, Container, Grid, Typography } from "@mui/material";
+import { Alert, AlertTitle, Box, Button, Container, Grid, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { recommendationsForm, recommendationsRoot } from "../../constants/routes";
 import { useBlocker, useNavigate, useParams } from "react-router-dom";
@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGetRecommendationQuery, useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
 
 import AddIcon from "@mui/icons-material/Add";
+import ConfirmationModal from "../subcomponets/ConfirmationModal";
 import { DevTool } from "@hookform/devtools";
 import GenericTextItem from "../subcomponets/GenericTextItem";
 import { LoadingButton } from "@mui/lab";
@@ -13,12 +14,12 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import SelectItem from "../subcomponets/SelectItem";
 import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
-import { useBeforeUnload } from "react-router-dom";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
 
 const RecommendationForm = ({ setToast, online }) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
 	const [songRows, setSongRows] = useState(0);
+	const [showModal, setShowModal] = useState(false);
 	const navigate = useNavigate();
 
 	const params = useParams();
@@ -40,6 +41,10 @@ const RecommendationForm = ({ setToast, online }) => {
 	//https://reactrouter.com/en/main/hooks/use-blocker
 	//!https://reactrouter.com/en/main/hooks/use-blocker#:~:text=Blocking%20a%20user,from%20navigating%20away.
 	let blocker = useBlocker(() => isDirty && !online);
+
+	useEffect(() => {
+		setShowModal(blocker.state === "blocked");
+	}, [blocker.state]);
 
 	useEffect(() => {
 		if (data) {
@@ -183,15 +188,36 @@ const RecommendationForm = ({ setToast, online }) => {
 		);
 	}, [isCreateMode, isDirty, isValid, online, showLoadingButton]);
 
+	const modal = useMemo(() => {
+		const ModalBody = () => {
+			return (
+				<>
+					<Alert severity="error" variant="filled">
+						<AlertTitle>Warning!</AlertTitle>
+						<div id="are-you-sure-text">Are you sure you want to leave?</div>
+					</Alert>
+					<Typography align="center" fontWeight={"bold"} pt={3}>
+						All data will be lost
+					</Typography>
+				</>
+			);
+		};
+		return (
+			<ConfirmationModal
+				showModal={true}
+				handleClose={() => {
+					blocker.reset();
+					setShowModal(false);
+				}}
+				confirmAction={() => blocker.proceed()}
+				ModalBody={ModalBody}
+			/>
+		);
+	}, [blocker]);
+
 	return (
 		<Container>
-			{blocker.state === "blocked" ? (
-				<div>
-					<p>Are you sure you want to leave?</p>
-					<button onClick={() => blocker.proceed()}>Proceed</button>
-					<button onClick={() => blocker.reset()}>Cancel</button>
-				</div>
-			) : null}
+			{showModal ? modal : null}
 			<FormProvider key="fireStationForm" {...methods}>
 				<Typography variant="h5" gutterBottom>
 					{isCreateMode ? "Create" : "Edit"} Recommendation
@@ -271,4 +297,3 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RecommendationForm);
-
