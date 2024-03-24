@@ -8,7 +8,7 @@ If you don't have a spotfiy dev account go [here](https://developer.spotify.com/
 
 Written in .Net and react
 
-deployed to https://www.domshyra.com
+deployed to [https://offlinepocweb.azurewebsites.net](https://offlinepocweb.azurewebsites.net)
 
 There are a few examples of how this project has progressed or the other technologies that have improved over time
 
