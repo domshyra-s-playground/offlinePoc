@@ -21,7 +21,6 @@ builder.Services.AddDbContext<PlaylistDbContext>(options =>
 {
     if (builder.Environment.IsDevelopment())
     {
-        // options.UseSqlServer($"Data Source=(LocalDB)\\MSSQLLocalDB;PlaylistDb.mdf;Integrated Security=True;Connect Timeout=30");
         options.UseSqlServer($"Data Source=(LocalDB)\\MSSQLLocalDB;Database=PlaylistDb;Integrated Security=True;Connect Timeout=30");
     }
     else if (builder.Environment.IsProduction())
