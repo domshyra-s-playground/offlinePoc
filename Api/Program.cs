@@ -21,10 +21,8 @@ builder.Services.AddDbContext<PlaylistDbContext>(options =>
 {
     if (builder.Environment.IsDevelopment())
     {
-
-        var folder = Environment.SpecialFolder.LocalApplicationData;
-        var path = Environment.GetFolderPath(folder);
-        options.UseSqlite($"Data Source={Path.Join(path, "playlist.db")}");
+        // options.UseSqlServer($"Data Source=(LocalDB)\\MSSQLLocalDB;PlaylistDb.mdf;Integrated Security=True;Connect Timeout=30");
+        options.UseSqlServer($"Data Source=(LocalDB)\\MSSQLLocalDB;Database=PlaylistDb;Integrated Security=True;Connect Timeout=30");
     }
     else if (builder.Environment.IsProduction())
     {
