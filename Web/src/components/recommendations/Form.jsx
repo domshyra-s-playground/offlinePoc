@@ -356,3 +356,4 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RecommendationForm);
+export { RequiredFields, Songs, SubmitButton, Modal, AddSongRowButton, RemoveSongRowButton };
