@@ -30,7 +30,7 @@ Here are some of the Form items in this application that demo basic CRUD operati
 ![image](https://github.com/domshyra-s-playground/baseRtkQueryApp/assets/1061957/bc9014bf-870c-4000-b7e8-c75d85126c21)
 
 #### Offline 
-if the app goes offline then the user will get an alert banner. This will disable saving on the form, and if the user has unsaved changes and tries to leave the form they will get a modal alert. 
+if the app goes offline then the user will get an alert banner. This will disable saving on the form, and if the user has unsaved changes and tries to leave the form they will get a modal alert. The RTKQuery data should be loaded from the cache and the user can still enter a recommendation while offline. 
 
 <img width="538" alt="image" src="https://github.com/domshyra-s-playground/offlinePoc/assets/1061957/e886ba9a-7ed7-4f56-a5f0-3886c73601ab"> <img width="304" alt="image" src="https://github.com/domshyra-s-playground/offlinePoc/assets/1061957/282b3a22-105a-40c7-a075-85c87a1e4c92">
 
