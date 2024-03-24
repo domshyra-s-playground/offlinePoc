@@ -10,6 +10,7 @@ import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import { Link as RouterLink } from "react-router-dom";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import { recommendationsLabel } from "../constants/labels";
 import { recommendationsRoot } from "../constants/routes";
 
 const StyledAppBar = () => {
@@ -31,7 +32,7 @@ const StyledAppBar = () => {
 			icon: <MusicVideoIcon />,
 		},
 		{
-			label: "Recommendations",
+			label: recommendationsLabel,
 			path: "recommendations",
 			icon: <PlaylistAddIcon />,
 		},

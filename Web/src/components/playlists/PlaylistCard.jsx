@@ -17,48 +17,30 @@ import { useNavigate } from "react-router-dom";
 const PlaylistCard = ({ title, imageURL, description, genre, trackAndFollowerText, ratingIsLoading, playlistRating, playlistId }) => {
 	const sectionWidth = 215;
 	const cardWidth = sectionWidth * 2;
-	const nav = useNavigate();
-
-	const heart = renderHeart(ratingIsLoading, title, playlistRating, playlistId);
 
 	return (
 		// TODO: make card into a class
-		<Card sx={{ display: "flex", maxWidth: cardWidth, minHeight: 200 }} className="Cardbk">
+		<Card sx={{ display: "flex", width: cardWidth, minHeight: 200 }} className="Cardbk">
 			<Box sx={{ display: "flex", flexDirection: "column" }}>
 				<CardContent sx={{ flex: "1 0 auto", width: sectionWidth }}>
-					{/* desktop w/ link */}
-					<Typography
-						sx={{ display: { xs: "none", md: "block" } }}
-						component="div"
-						variant="h6"
-						color="primary"
-						onClick={() => nav(`${playlistRoot}/${playlistId}`)}
-					>
-						{title}
-					</Typography>
-					{/* mobile w/o link */}
-					<Typography sx={{ display: { xs: "block", md: "none" } }} component="div" variant="h6" color="text.secondary.light">
-						{title}
-					</Typography>
-					<Typography variant="subtitle2" color="text.secondary" component="div" gutterBottom>
-						{description}
-					</Typography>
-					{heart()}
-					{OpenInSpotifyText(playlistId)}
-					{/* mobile */}
-					<Typography sx={{ display: { xs: "block", md: "none" } }} component="div" variant="caption" color="text.secondary" align="center">
-						{genre}
-					</Typography>
-					{/* mobile */}
-					<Typography
-						sx={{ display: { xs: "block", md: "none" } }}
-						component="div"
-						variant="caption"
-						color="text.secondary.light"
-						align="center"
-					>
-						{trackAndFollowerText}
-					</Typography>
+					<DesktopCardContent
+						title={title}
+						ratingIsLoading={ratingIsLoading}
+						description={description}
+						genre={genre}
+						trackAndFollowerText={trackAndFollowerText}
+						playlistRating={playlistRating}
+						playlistId={playlistId}
+					/>
+					<MobileCardContent
+						title={title}
+						genre={genre}
+						ratingIsLoading={ratingIsLoading}
+						trackAndFollowerText={trackAndFollowerText}
+						description={description}
+						playlistRating={playlistRating}
+						playlistId={playlistId}
+					/>
 				</CardContent>
 				{/* desktop */}
 				<Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", pl: 1, maxWidth: sectionWidth }}>
@@ -77,6 +59,56 @@ const PlaylistCard = ({ title, imageURL, description, genre, trackAndFollowerTex
 		</Card>
 	);
 };
+
+const DescriptionCardContent = ({ title, description, ratingIsLoading, playlistRating, playlistId }) => {
+	const heart = renderHeart(ratingIsLoading, title, playlistRating, playlistId);
+
+	return (
+		<>
+			<Typography variant="subtitle2" color="text.secondary" component="div" gutterBottom>
+				{description}
+			</Typography>
+			{heart()}
+			{OpenInSpotifyText(playlistId)}
+		</>
+	);
+};
+
+const DesktopCardContent = ({ title, playlistId }) => {
+	const nav = useNavigate();
+
+	return (
+		<>
+			<Typography
+				sx={{ display: { xs: "none", md: "block" } }}
+				component="div"
+				variant="h6"
+				color="primary"
+				onClick={() => nav(`${playlistRoot}/${playlistId}`)}
+			>
+				{title}
+			</Typography>
+		</>
+	);
+};
+
+const MobileCardContent = ({ title, genre, ratingIsLoading, trackAndFollowerText, description, playlistRating, playlistId }) => {
+	return (
+		<>
+			<Typography sx={{ display: { xs: "block", md: "none" } }} component="div" variant="h6" color="text.secondary.light">
+				{title}
+			</Typography>
+			<DescriptionCardContent title={title} description={description} playlistId={playlistId} playlistRating={ratingIsLoading} />
+			<Typography sx={{ display: { xs: "block", md: "none" } }} component="div" variant="caption" color="text.secondary" align="center">
+				{genre}
+			</Typography>
+			<Typography sx={{ display: { xs: "block", md: "none" } }} component="div" variant="caption" color="text.secondary.light" align="center">
+				{trackAndFollowerText}
+			</Typography>
+		</>
+	);
+};
+
 PlaylistCard.propType = {
 	title: PropTypes.string,
 	anchorId: PropTypes.string,

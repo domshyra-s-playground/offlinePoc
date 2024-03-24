@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Link, Typography } from "@mui/material";
+import { Box, Button, Container, Grid, Link, Typography } from "@mui/material";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import React, { forwardRef, useCallback, useRef } from "react";
 import { alpha, styled } from "@mui/material/styles";
@@ -199,10 +199,12 @@ const StyledDataGrid = (props) => {
 	};
 
 	return (
-		<Box mb={2} pb={2}>
-			<Header createLabel={createLabel} createPath={createPath} singleton={singleton} title={title} />
-			<StripedDataGridComponent {...props} columns={[...props.columns, actionButtonsColumnDefinition]} ref={ref} />
-		</Box>
+		<Container>
+			<Box mb={2} pb={2}>
+				<Header createLabel={createLabel} createPath={createPath} singleton={singleton} title={title} />
+				<StripedDataGridComponent {...props} columns={[...props.columns, actionButtonsColumnDefinition]} ref={ref} />
+			</Box>
+		</Container>
 	);
 };
 

@@ -1,11 +1,11 @@
-import Container from "@mui/material/Container";
+import { Grid } from "@mui/material";
 import React from "react";
 import ToastAlert from "../components/subcomponets/ToastAlert";
 
 export const ToastLayout = (props) => {
 	return (
 		<>
-			<Container>{props.children}</Container>
+			<Grid container>{props.children}</Grid>
 			<ToastAlert show={false}></ToastAlert>
 		</>
 	);

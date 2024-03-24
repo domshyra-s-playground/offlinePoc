@@ -1,4 +1,4 @@
-import { Box, Grid, Skeleton, Typography } from "@mui/material";
+import { Box, Container, Grid, Skeleton, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
 import PlaylistCard from "./PlaylistCardSelfFetching";
@@ -19,23 +19,26 @@ const ViewPlaylists = () => {
 
 	const renderCards = (data) => {
 		return data.map((item) => (
-			<React.Fragment key={item.playlistId}>
-				<Grid item xs={12} md={6} lg={4} xl={3} pb={2} px={1}>
-					<PlaylistCard {...item} />
-				</Grid>
-			</React.Fragment>
+			<Grid item xs={12} xl={3} md={5} sm={6} pb={2} px={1} mx={1} key={item.playlistId}>
+				<PlaylistCard {...item} />
+			</Grid>
 		));
 	};
 
-	//TODO! the view is now a bit off center, need to fix that since adding container
 	return (
 		<>
-			<Box sx={{ justifyContent: "center" }}>
-				<Typography variant="h3" gutterBottom>
-					Playlists
-				</Typography>
+			<Container>
+				<Box sx={{ justifyContent: "center" }}>
+					<Typography variant="h3" gutterBottom>
+						Playlists
+					</Typography>
+				</Box>
+			</Container>
+			<Box mb={2} pb={2}>
+				<Grid container spacing={1} sx={{ justifyContent: "center" }}>
+					{!isLoading ? cards : <Skeleton />}
+				</Grid>
 			</Box>
-			<Grid container>{!isLoading ? cards : <Skeleton />}</Grid>
 		</>
 	);
 };

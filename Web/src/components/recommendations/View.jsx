@@ -4,6 +4,7 @@ import { useDeleteRecommendationMutation, useGetRecommendationsQuery } from "../
 
 import StyledDataGrid from "../subcomponets/StyledDataGrid";
 import { connect } from "react-redux";
+import { recommendationsLabel } from "../../constants/labels";
 import { setToast } from "../../redux/slices/toast";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
 
@@ -26,7 +27,7 @@ const ViewRecommendations = ({ setToast }) => {
 			columns={columns}
 			loading={isLoading}
 			singleton="Recommendation"
-			title="Recommendations"
+			title={recommendationsLabel}
 			rows={data ?? []}
 			hyperlinkColumnFieldName="name"
 			hyperlinkUrl={recommendationsForm}
