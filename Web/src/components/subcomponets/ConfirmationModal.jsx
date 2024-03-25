@@ -55,7 +55,7 @@ const ConfirmationModal = ({
 				id="modal-confirm-btn"
 				color={confirmationButtonColor}
 				align="right"
-				variant="text"
+				variant="contained"
 				onClick={confirm}
 				disabled={disableConfirmationButton}
 			>
@@ -81,7 +81,7 @@ const ConfirmationModal = ({
 					{confirmButton()}
 				</Grid>
 				<Grid container justifyContent={"flex-end"}>
-					<Button id="modal-close-btn" onClick={() => setShow(false)} color={"secondary"}>
+					<Button id="modal-close-btn" onClick={() => setShow(false)} color={"primary"}>
 						{closeButtonText}
 					</Button>
 				</Grid>
