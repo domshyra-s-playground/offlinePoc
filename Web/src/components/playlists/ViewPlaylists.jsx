@@ -25,6 +25,17 @@ const ViewPlaylists = () => {
 		));
 	};
 
+	const renderSkeletons = () => {
+		const array = new Array(6).fill(0);
+		return array.map(() => (
+			<Grid item xs={12} xl={3} md={5} sm={6} pb={2} px={1} mx={1}>
+				<Box sx={{ display: "flex", flexDirection: "column" }}>
+					<Skeleton variant="rounded" width={200} height={60} />
+				</Box>
+			</Grid>
+		));
+	};
+
 	return (
 		<>
 			<Container>
@@ -36,7 +47,7 @@ const ViewPlaylists = () => {
 			</Container>
 			<Box mb={2} pb={2}>
 				<Grid container spacing={1} sx={{ justifyContent: "center" }}>
-					{!isLoading ? cards : <Skeleton />}
+					{!isLoading ? cards : renderSkeletons()}
 				</Grid>
 			</Box>
 		</>
