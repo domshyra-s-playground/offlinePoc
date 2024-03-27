@@ -8,7 +8,7 @@ import { useTheme } from "@mui/material/styles";
 
 /**
  * Used for all text items
- * can work in forms if customControl and name is provided, can work in autoSaves if OnBlur is provided
+ * can work in forms if customControl and name is provided
  * @remarks this is the base for all numeric item/fields
  * @remarks This can be used as a FORM ITEM if you supply a customControl
  * @param {*} props
@@ -23,8 +23,6 @@ const GenericTextItem = ({
 	onTextFieldChange = () => {},
 	textFieldValue,
 	onTextFieldBlur = () => {},
-	onParentTextFieldBlur = () => {},
-	onParentTextFieldChange = () => {},
 	isInvalid = () => {
 		return false;
 	},
@@ -41,9 +39,8 @@ const GenericTextItem = ({
 	name = "",
 	maxWidth = 75,
 	isNumberOnly = false,
-	fullWidth = false,
 	isLoading = false,
-	multiline = false,
+	...props
 }) => {
 	const theme = useTheme();
 	//Create a new form for each item, unless a custom control is provided
@@ -97,16 +94,15 @@ const GenericTextItem = ({
 				<>
 					<Stack spacing={1} justifyContent="center">
 						<TextField
+							{...props}
+							value={value}
 							label={label}
 							id={id}
 							required={isRequired()}
 							name={name ? name : id}
-							fullWidth={fullWidth}
 							variant="standard"
 							color="primary"
-							value={value}
 							inputRef={ref}
-							multiline={multiline}
 							error={error !== undefined || isInvalid(error)}
 							InputProps={{
 								endAdornment: <InputAdornment position="end">{endAdornment}</InputAdornment>,
@@ -115,29 +111,22 @@ const GenericTextItem = ({
 								inputProps: inputProps,
 							}}
 							style={textFieldStyle}
-							disabled={disabled}
 							onChange={(e) => {
 								if (isNumberOnly) {
 									//Only save safe values. This still works with decimals because the regex
 									if (isSafeNumberValue(e.target.value) || e.target.value === ".") {
 										onChange(e);
 										onTextFieldChange(e);
-										onParentTextFieldChange(e.target.id, e.target.value);
 									}
 								} else {
 									onChange(e);
 									onTextFieldChange(e);
-									onParentTextFieldChange(e.target.id, e.target.value);
 								}
 							}}
 							onBlur={(e) => {
 								setFocused(false);
 								onBlur(e);
 								onTextFieldBlur(e);
-								if (!error) {
-									// only trigger the auto-save ability if no error
-									onParentTextFieldBlur(e.target.id, e.target.value);
-								}
 							}}
 							onFocus={() => {
 								setFocused(true);
