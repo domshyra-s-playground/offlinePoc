@@ -1,12 +1,17 @@
 import { Box, Button, Container, Grid, Link, Typography } from "@mui/material";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
-import React, { forwardRef, useCallback, useRef } from "react";
+import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { alpha, styled } from "@mui/material/styles";
 
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteModal from "./modals/DeleteModal";
 import PropTypes from "prop-types";
 import { Link as RouterLink } from "react-router-dom";
+import { connect } from "react-redux";
+import { setToast } from "../../redux/slices/toast";
+
+//TODO! there is a bug where the height of the data grid will overflow the container
 
 const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
 	[`& .${gridClasses.row}.odd`]: {
@@ -178,8 +183,18 @@ const StripedDataGridComponent = forwardRef((props, ref) => {
 
 const StyledDataGrid = (props) => {
 	const ref = useRef(null);
-	const { singleton, title, createPath, deleteAction } = props;
-	const createLabel = `Create ${props.singleton}`;
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [selectedRecordId, setSelectedRecordId] = useState(null);
+
+	const handleOpenDeleteModal = useCallback(() => {
+		setShowDeleteModal(true);
+	}, []);
+	const handleCloseDeleteModal = useCallback(() => {
+		setShowDeleteModal(false);
+	}, []);
+
+	const { singleton, title, createPath, deleteAction, setToast } = props;
+	const createLabel = `Create ${singleton}`;
 
 	/**
 	 * Defines all the available action buttons for the data grid and places them in a single column.
@@ -194,15 +209,50 @@ const StyledDataGrid = (props) => {
 		flex: 2,
 		align: "right",
 		renderCell: (cellValues) => {
-			return <DeleteActionButton cellValues={cellValues} deleteAction={deleteAction} singleton={singleton} />;
+			return (
+				<DeleteActionButton
+					cellValues={cellValues}
+					setSelectedRecordId={setSelectedRecordId}
+					handleOpenDeleteModal={handleOpenDeleteModal}
+					singleton={singleton}
+				/>
+			);
 		},
 	};
+
+	/**
+	 * Defines the delete modal for the data grid.
+	 * this expects and rtkquery mutation to be passed in as a deleteAction prop.
+	 */
+	const deleteModal = useMemo(() => {
+		const deleteRecord = async () => {
+			await deleteAction(selectedRecordId)
+				.unwrap()
+				.then(() => {
+					setToast({ show: true, message: `${singleton} deleted.` });
+				})
+				.catch(() => {
+					setToast({ show: true, message: `Error deleting ${singleton}.` });
+				});
+		};
+
+		return (
+			<DeleteModal
+				key={selectedRecordId}
+				singleton={singleton}
+				action={deleteRecord}
+				show={showDeleteModal}
+				handleClose={handleCloseDeleteModal}
+			/>
+		);
+	}, [selectedRecordId, singleton, showDeleteModal, handleCloseDeleteModal, deleteAction, setToast]);
 
 	return (
 		<Container>
 			<Box mb={2} pb={2}>
 				<Header createLabel={createLabel} createPath={createPath} singleton={singleton} title={title} />
 				<StripedDataGridComponent {...props} columns={[...props.columns, actionButtonsColumnDefinition]} ref={ref} />
+				{deleteModal}
 			</Box>
 		</Container>
 	);
@@ -256,7 +306,7 @@ StyledDataGrid.prototypes = {
  * @param {Object} cellValues - The values of the current cell.
  * @returns {JSX.Element}
  */
-const DeleteActionButton = ({ cellValues, deleteAction, singleton }) => {
+const DeleteActionButton = ({ cellValues, setSelectedRecordId, handleOpenDeleteModal, singleton }) => {
 	const title = `Delete ${singleton}`;
 	return (
 		<Button
@@ -264,7 +314,8 @@ const DeleteActionButton = ({ cellValues, deleteAction, singleton }) => {
 			variant="text"
 			color="primary"
 			onClick={() => {
-				deleteAction(cellValues.row.id);
+				setSelectedRecordId(cellValues.row.id);
+				handleOpenDeleteModal();
 			}}
 			aria-label={title}
 			title={title}
@@ -300,5 +351,14 @@ const Header = ({ createLabel, createPath, singleton, title }) => {
 		</Box>
 	);
 };
-export default StyledDataGrid;
+
+function mapStateToProps() {
+	return {};
+}
+
+const mapDispatchToProps = {
+	setToast,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(StyledDataGrid);
 export { StripedDataGridComponent };

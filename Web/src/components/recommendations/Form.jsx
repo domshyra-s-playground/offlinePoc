@@ -2,11 +2,11 @@ import { Alert, AlertTitle, Box, Button, Container, Grid, Typography } from "@mu
 import { FormProvider, useForm } from "react-hook-form";
 import { recommendationsForm, recommendationsRoot } from "../../constants/routes";
 import { useBlocker, useNavigate, useParams } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGetRecommendationQuery, useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
 
 import AddIcon from "@mui/icons-material/Add";
-import ConfirmationModal from "../subcomponets/ConfirmationModal";
+import ConfirmationModal from "../subcomponets/modals/ConfirmationModal";
 import { DevTool } from "@hookform/devtools";
 import GenericTextItem from "../subcomponets/GenericTextItem";
 import { LoadingButton } from "@mui/lab";
@@ -95,7 +95,7 @@ const RecommendationForm = ({ setToast, online }) => {
 
 	return (
 		<Container>
-			{showModal ? <Modal blocker={blocker} setShowModal={setShowModal} /> : null}
+			{showModal ? <UnsavedChangesModal blocker={blocker} setShowModal={setShowModal} /> : null}
 			<FormProvider key="fireStationForm" {...methods}>
 				<Typography variant="h5" gutterBottom>
 					{isCreateMode ? "Create" : "Edit"} Recommendation
@@ -266,33 +266,40 @@ const SubmitButton = ({ isCreateMode, isDirty, isValid, online, showLoadingButto
  * @property {Function} confirmAction - Callback function to handle the confirm action.
  * @property {React.ComponentType} ModalBody - The body component of the modal.
  */
-const Modal = ({ blocker, setShowModal }) => {
+const UnsavedChangesModal = ({ blocker, setShowModal }) => {
 	/**
 	 * Renders the modal body component.
 	 * @returns {JSX.Element} The rendered modal body.
 	 */
-	const ModalBody = () => {
+	const ModalBody = useMemo(() => {
 		return (
-			<>
-				<Alert severity="error" variant="filled">
-					<AlertTitle>Warning!</AlertTitle>
-					<div id="are-you-sure-text">Are you sure you want to leave?</div>
-				</Alert>
-				<Typography align="center" fontWeight={"bold"} pt={3}>
-					All data will be lost
-				</Typography>
-			</>
+			<Typography align="center" fontWeight={"bold"} pt={3}>
+				All data will be lost
+			</Typography>
 		);
-	};
+	}, []);
+	/**
+	 * Renders the modal title component.
+	 * @returns {JSX.Element} The rendered modal body.
+	 */
+	const ModalTitle = useMemo(() => {
+		return (
+			<Alert severity="error" variant="filled">
+				<AlertTitle>Warning!</AlertTitle>
+				<div id="are-you-sure-text">Are you sure you want to leave?</div>
+			</Alert>
+		);
+	}, []);
 	return (
 		<ConfirmationModal
-			showModal={true}
+			show={true}
 			handleClose={() => {
 				blocker.reset();
 				setShowModal(false);
 			}}
-			confirmAction={() => blocker.proceed()}
+			action={() => blocker.proceed()}
 			ModalBody={ModalBody}
+			ModalTitle={ModalTitle}
 		/>
 	);
 };
@@ -356,4 +363,4 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RecommendationForm);
-export { RequiredFields, Songs, SubmitButton, Modal, AddSongRowButton, RemoveSongRowButton };
+export { RequiredFields, Songs, SubmitButton, UnsavedChangesModal, AddSongRowButton, RemoveSongRowButton };

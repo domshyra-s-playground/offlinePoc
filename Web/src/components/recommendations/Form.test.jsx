@@ -1,4 +1,4 @@
-import { AddSongRowButton, Modal, RemoveSongRowButton, RequiredFields, Songs, SubmitButton } from "./Form";
+import { AddSongRowButton, RemoveSongRowButton, RequiredFields, Songs, SubmitButton, UnsavedChangesModal } from "./Form";
 import { fireEvent, render, screen } from "@testing-library/react";
 
 import React from "react";
@@ -84,7 +84,7 @@ describe("Modal", () => {
 			proceed: jest.fn(),
 		};
 
-		render(<Modal blocker={blocker} setShowModal={setShowModal} />);
+		render(<UnsavedChangesModal blocker={blocker} setShowModal={setShowModal} />);
 
 		const modalBody = screen.getByText("Are you sure you want to leave?");
 		expect(modalBody).toBeInTheDocument();
@@ -97,7 +97,7 @@ describe("Modal", () => {
 			proceed: jest.fn(),
 		};
 
-		render(<Modal blocker={blocker} setShowModal={setShowModal} />);
+		render(<UnsavedChangesModal blocker={blocker} setShowModal={setShowModal} />);
 
 		const closeButton = screen.getByLabelText("Close");
 		fireEvent.click(closeButton);
@@ -114,7 +114,7 @@ describe("Modal", () => {
 			proceed: jest.fn(),
 		};
 
-		render(<Modal blocker={blocker} setShowModal={setShowModal} />);
+		render(<UnsavedChangesModal blocker={blocker} setShowModal={setShowModal} />);
 
 		const confirmButton = screen.getByLabelText("Confirm");
 		fireEvent.click(confirmButton);

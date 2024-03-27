@@ -1,24 +1,14 @@
-import React, { useCallback } from "react";
 import { recommendationsCreate, recommendationsForm } from "../../constants/routes";
 import { useDeleteRecommendationMutation, useGetRecommendationsQuery } from "../../redux/services/playlistRecommendationApi";
 
+import React from "react";
 import StyledDataGrid from "../subcomponets/StyledDataGrid";
-import { connect } from "react-redux";
 import { recommendationsLabel } from "../../constants/labels";
-import { setToast } from "../../redux/slices/toast";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
 
-const ViewRecommendations = ({ setToast }) => {
+const ViewRecommendations = () => {
 	const { data, isLoading } = useGetRecommendationsQuery();
 	const [deleteRecommendation] = useDeleteRecommendationMutation();
-
-	const deleteRow = useCallback(
-		(id) => {
-			deleteRecommendation(id);
-			setToast({ show: true, message: "Recommendation deleted." });
-		},
-		[deleteRecommendation, setToast]
-	);
 
 	//Grab the genres from the Spotify API for offline use
 	useGetGenresQuery();
@@ -32,16 +22,9 @@ const ViewRecommendations = ({ setToast }) => {
 			hyperlinkColumnFieldName="name"
 			hyperlinkUrl={recommendationsForm}
 			createPath={recommendationsCreate}
-			deleteAction={deleteRow}
+			deleteAction={deleteRecommendation}
 		/>
 	);
-};
-function mapStateToProps() {
-	return {};
-}
-
-const mapDispatchToProps = {
-	setToast,
 };
 const columns = [
 	{
@@ -64,5 +47,4 @@ const columns = [
 	},
 ];
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(ViewRecommendations);
+export default ViewRecommendations;

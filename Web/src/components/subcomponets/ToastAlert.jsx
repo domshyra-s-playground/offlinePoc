@@ -44,10 +44,10 @@ const mapDispatchToProps = {
 export default connect(mapStateToProps, mapDispatchToProps)(ToastAlert);
 
 ToastAlert.propTypes = {
-	show: PropTypes.bool.isRequired,
+	show: PropTypes.bool,
 	isError: PropTypes.bool,
 	displaySeverity: PropTypes.string,
-	message: PropTypes.string.isRequired,
+	message: PropTypes.string,
 	link: PropTypes.string,
 	setToast: PropTypes.func.isRequired,
 };
