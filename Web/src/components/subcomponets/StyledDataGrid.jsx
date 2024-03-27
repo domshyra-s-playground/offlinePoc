@@ -1,6 +1,6 @@
 import { Box, Button, Container, Grid, Link, Typography } from "@mui/material";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
-import React, { forwardRef, useCallback, useMemo, useRef, useState } from "react";
+import React, { forwardRef, useCallback, useRef, useState } from "react";
 import { alpha, styled } from "@mui/material/styles";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -10,8 +10,6 @@ import PropTypes from "prop-types";
 import { Link as RouterLink } from "react-router-dom";
 import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
-
-//TODO! there is a bug where the height of the data grid will overflow the container
 
 const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
 	[`& .${gridClasses.row}.odd`]: {
@@ -151,10 +149,11 @@ const StripedDataGridComponent = forwardRef((props, ref) => {
 		[columns, hyperlinkColumnFieldName]
 	);
 
+	//TODO! height and autoHeight are not working as expected therefor we just set the height to 60vh
 	return (
 		<div
 			style={{
-				height: "20vh",
+				height: "60vh",
 				width: "100%",
 			}}
 		>
@@ -163,7 +162,6 @@ const StripedDataGridComponent = forwardRef((props, ref) => {
 				rows={rows}
 				columnVisibilityModel={props.columnVisibilityModel ?? {}}
 				ref={ref}
-				autoHeight={rows?.length > 0 ? true : false}
 				getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd")}
 				loading={loading}
 				columns={replaceHyperlinkColumn(createHyperlinkColumn(props.hyperlinkUrl))}
@@ -224,35 +222,29 @@ const StyledDataGrid = (props) => {
 	 * Defines the delete modal for the data grid.
 	 * this expects and rtkquery mutation to be passed in as a deleteAction prop.
 	 */
-	const deleteModal = useMemo(() => {
-		const deleteRecord = async () => {
-			await deleteAction(selectedRecordId)
-				.unwrap()
-				.then(() => {
-					setToast({ show: true, message: `${singleton} deleted.` });
-				})
-				.catch(() => {
-					setToast({ show: true, message: `Error deleting ${singleton}.` });
-				});
-		};
-
-		return (
-			<DeleteModal
-				key={selectedRecordId}
-				singleton={singleton}
-				action={deleteRecord}
-				show={showDeleteModal}
-				handleClose={handleCloseDeleteModal}
-			/>
-		);
-	}, [selectedRecordId, singleton, showDeleteModal, handleCloseDeleteModal, deleteAction, setToast]);
+	const deleteRecord = useCallback(async () => {
+		await deleteAction(selectedRecordId)
+			.unwrap()
+			.then(() => {
+				setToast({ show: true, message: `${singleton} deleted.` });
+			})
+			.catch(() => {
+				setToast({ show: true, message: `Error deleting ${singleton}.` });
+			});
+	}, [deleteAction, selectedRecordId, setToast, singleton]);
 
 	return (
 		<Container>
 			<Box mb={2} pb={2}>
 				<Header createLabel={createLabel} createPath={createPath} singleton={singleton} title={title} />
 				<StripedDataGridComponent {...props} columns={[...props.columns, actionButtonsColumnDefinition]} ref={ref} />
-				{deleteModal}
+				<DeleteModal
+					key={selectedRecordId}
+					singleton={singleton}
+					action={deleteRecord}
+					show={showDeleteModal}
+					handleClose={handleCloseDeleteModal}
+				/>
 			</Box>
 		</Container>
 	);
@@ -312,7 +304,7 @@ const DeleteActionButton = ({ cellValues, setSelectedRecordId, handleOpenDeleteM
 		<Button
 			id={`deleteRow-${cellValues.row.id}`}
 			variant="text"
-			color="primary"
+			color="error"
 			onClick={() => {
 				setSelectedRecordId(cellValues.row.id);
 				handleOpenDeleteModal();

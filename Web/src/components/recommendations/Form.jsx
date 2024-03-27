@@ -317,7 +317,7 @@ const AddSongRowButton = ({ setSongRows, songRows }) => {
 				id="add-song-row-btn"
 				type="button"
 				color="primary"
-				variant="contained"
+				variant="outlined"
 				size="small"
 				startIcon={<AddIcon />}
 				onClick={() => setSongRows(songRows + 1)}
@@ -341,7 +341,7 @@ const RemoveSongRowButton = ({ setSongRows, songRows }) => {
 				id="add-song-row-btn"
 				type="button"
 				color="primary"
-				variant="contained"
+				variant="outlined"
 				size="small"
 				startIcon={<RemoveIcon />}
 				onClick={() => setSongRows(songRows - 1)}

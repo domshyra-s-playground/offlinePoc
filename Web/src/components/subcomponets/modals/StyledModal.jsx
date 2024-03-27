@@ -14,7 +14,6 @@ import PropTypes from "prop-types";
 
 const StyledModal = ({
 	show,
-	setShow,
 	action,
 	prompt = "Action",
 	actionColor = "primary",
@@ -50,8 +49,8 @@ const StyledModal = ({
 	}, [actionColor, actionOnClick, loading, prompt]);
 
 	const close = () => {
-		setOpen(false);
 		handleClose();
+		setOpen(false);
 	};
 
 	return (
