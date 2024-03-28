@@ -4,10 +4,11 @@ import React, { Fragment, useCallback, useMemo, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import PropTypes from "prop-types";
 
-//TODO! still some issue where the modal does reopen after being closed. It seems to be calling the parent component but not reopening the modal
-
 /**
  * base modal component
+ * @remarks when using this component you must pass in the action to be performed when the action button is clicked
+ * @remarks when using this component remember to give it a key to force a re-render, this is because the modal will not re-render when the show prop is toggled
+ * for example <StyledModal key={show ? "someId" : ""} ... />
  * @param {*} param0
  * @returns
  */

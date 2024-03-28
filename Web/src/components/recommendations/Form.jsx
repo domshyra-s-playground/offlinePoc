@@ -95,7 +95,7 @@ const RecommendationForm = ({ setToast, online }) => {
 
 	return (
 		<Container>
-			{showModal ? <UnsavedChangesModal blocker={blocker} setShowModal={setShowModal} /> : null}
+			{showModal ? <UnsavedChangesModal key={showModal ? "unsaved-changes" : ""} blocker={blocker} setShowModal={setShowModal} /> : null}
 			<FormProvider key="fireStationForm" {...methods}>
 				<Typography variant="h5" gutterBottom>
 					{isCreateMode ? "Create" : "Edit"} Recommendation
