@@ -63,6 +63,7 @@ namespace Controllers
             return CreatedAtAction("GetRecommendation", new { id = newRecord.Id }, newRecord);
         }
 
+        // Patch: api/Recommendations/5
         [HttpPatch("{id}")]
         public async Task<IActionResult> PatchRecommendationAsync(string id, [FromBody] JsonPatchDocument<PlaylistRecommendationDto> patch)
         {
