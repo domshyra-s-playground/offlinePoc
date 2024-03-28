@@ -228,7 +228,7 @@ const Songs = ({ isLoading, control, songRows }) => {
  *
  * @returns {JSX.Element} The submit button JSX element.
  */
-const SubmitButton = ({ isCreateMode, isDirty, isValid, online, offlineAt, offlineAtDisplay, showLoadingButton }) => {
+const SubmitButton = ({ isCreateMode, isDirty, isValid, online, offlineAt, offlineAtDisplay, showLoadingButton, lastSaved }) => {
 	const formIsModified = isDirty || !isValid;
 
 	const btnText = () => {
@@ -251,6 +251,7 @@ const SubmitButton = ({ isCreateMode, isDirty, isValid, online, offlineAt, offli
 
 		return !isDirty || !isValid;
 	};
+	const showButton = offlineAt && online && formIsModified && lastSaved > offlineAt;
 
 	if (!isCreateMode && !offlineAt) {
 		return null;
@@ -259,24 +260,26 @@ const SubmitButton = ({ isCreateMode, isDirty, isValid, online, offlineAt, offli
 	return (
 		<>
 			<Stack spacing={2}>
-				<SubmitButtonHelperText online={online} offlineAt={offlineAt} offlineAtDisplay={offlineAtDisplay} formIsModified={formIsModified} />
+				<SubmitButtonHelperText online={online} offlineAt={offlineAt} offlineAtDisplay={offlineAtDisplay} lastSaved={showButton} />
 			</Stack>
-			<LoadingButton
-				key="bcegsSubmit"
-				id="submit-form-btn"
-				type="submit"
-				color="primary"
-				variant="contained"
-				loading={showLoadingButton}
-				disabled={btnDisabled()}
-			>
-				{btnText()}
-			</LoadingButton>
+			{showButton ? (
+				<LoadingButton
+					key="bcegsSubmit"
+					id="submit-form-btn"
+					type="submit"
+					color="primary"
+					variant="contained"
+					loading={showLoadingButton}
+					disabled={btnDisabled()}
+				>
+					{btnText()}
+				</LoadingButton>
+			) : null}
 		</>
 	);
 };
 
-const SubmitButtonHelperText = ({ online, offlineAt, offlineAtDisplay, formIsModified, lastSaved }) => {
+const SubmitButtonHelperText = ({ online, offlineAt, offlineAtDisplay, showButton }) => {
 	return (
 		<>
 			{offlineAt && !online ? (
@@ -284,7 +287,7 @@ const SubmitButtonHelperText = ({ online, offlineAt, offlineAtDisplay, formIsMod
 					You have went offline, we cannot auto save.
 				</FormHelperText>
 			) : null}
-			{offlineAt && online && formIsModified && lastSaved > offlineAt ? (
+			{showButton ? (
 				<FormHelperText sx={{ textAlign: "left" }} pb={0}>
 					You have went back online, we have haven't saved since {offlineAtDisplay}. Please hit save when ready.
 				</FormHelperText>

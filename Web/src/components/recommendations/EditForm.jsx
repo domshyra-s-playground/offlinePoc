@@ -62,7 +62,8 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 		params.id,
 		"Recommendation",
 		patchRecommendation,
-		setToast
+		setToast,
+		!online
 	);
 
 	useEffect(() => {
@@ -164,6 +165,7 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 							offlineAt={offlineAt}
 							offlineAtDisplay={offlineAtDisplay}
 							showLoadingButton={showLoadingButton}
+							lastSaved={savedAt}
 						/>
 					</Grid>
 					<DevTool control={methods.control} />

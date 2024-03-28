@@ -6,7 +6,7 @@ import { isProdEnv } from "./config";
 import { useBeforeUnload } from "react-router-dom";
 
 //3 seconds for local/dev, 60 seconds for prod
-const autoSaveInterval = isProdEnv() ? 60000 : 3000;
+const autoSaveInterval = isProdEnv() ? 60000 : 5000;
 
 /**
  * Used to auto save a record every 60 seconds once methods.formState.isDirty is true and will use the rtkQueryMutation to save the record
@@ -20,9 +20,10 @@ const autoSaveInterval = isProdEnv() ? 60000 : 3000;
  * @param {*} recordName record name to be used in the toast message
  * @param {*} rtkQueryMutation patch mutation to be used to save the record
  * @param {*} setToast redux action to set the toast
+ * @param {bool} offline should we try to save the record
  * @remarks This doesn't work with rhf objects, there is a bug with rhf.
  */
-export default function useAutoSave(defaultValues, isDirty, getValues, resetField, id, recordName, rtkQueryMutation, setToast) {
+export default function useAutoSave(defaultValues, isDirty, getValues, resetField, id, recordName, rtkQueryMutation, setToast, offline) {
 	const [autoSave, setAutoSave] = useState(null);
 	const [savedAt, setSavedAt] = useState(null);
 
@@ -62,8 +63,10 @@ export default function useAutoSave(defaultValues, isDirty, getValues, resetFiel
 				}
 			}
 		}
-		autoSaveData();
-	}, [autoSave, id, defaultValues, getValues, resetField, recordName, rtkQueryMutation, setToast]);
+		if (!offline) {
+			autoSaveData();
+		}
+	}, [autoSave, id, defaultValues, getValues, resetField, recordName, rtkQueryMutation, setToast, offline]);
 
 	//On page refresh send data to the back end
 	useBeforeUnload(
@@ -115,7 +118,9 @@ async function autoSaveRecord(defaultValues, getValues, resetField, rtkQueryMuta
  */
 function resetUpdatedFields(valuesToSave, getValues, resetField, operations) {
 	//if the field is different than when we save, keep that one dirty so we don't loose data, notes for example
-	const inProgressOperations = jsonpatch.compare(valuesToSave, getValues());
+	//TODO! there is a bug where song rows will get deleted if in progress and we save
+	const valuesAfterSave = getValues();
+	const inProgressOperations = jsonpatch.compare(valuesToSave, valuesAfterSave);
 	const inProgressFields = inProgressOperations.map((operation) => {
 		return getFieldNameFromOperation(operation);
 	});
