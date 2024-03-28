@@ -1,5 +1,5 @@
 import { Box, Container, FormHelperText, Grid, Paper, Typography } from "@mui/material";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, set, useForm } from "react-hook-form";
 import { RequiredFields, SongFields, SubmitButton, UnsavedChangesModal, songRowsDefault } from "./Form";
 import { recommendationsForm, recommendationsRoot } from "../../constants/routes";
 import { useBlocker, useNavigate, useParams } from "react-router-dom";
@@ -32,6 +32,7 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 
 	const [songRows, setSongRows] = useState(songRowsDefault);
 	const [showModal, setShowModal] = useState(false);
+	const [recommendationLoaded, setRecommendationLoaded] = useState(false);
 	const navigate = useNavigate();
 
 	const params = useParams();
@@ -44,7 +45,7 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 
 	const { id } = params;
 
-	const { data, isLoading } = useGetRecommendationQuery(id);
+	const { data: recommendation, isLoading } = useGetRecommendationQuery(id);
 	const { data: genres, isLoading: genresAreLoading } = useGetGenresQuery();
 
 	const [upsertRecommendation] = useUpsertRecommendationMutation();
@@ -70,13 +71,16 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 		setShowModal(blocker.state === "blocked");
 	}, [blocker.state]);
 
+	//used for the initial load of the form
 	useEffect(() => {
-		if (data) {
-			methods.reset(data, { keepDefaultValues: false, keepDirty: false });
-			const loadedSongRows = data?.suggestions?.length > 0 ? data?.suggestions.map((item) => item.id) : songRowsDefault;
+		if (recommendation && !recommendationLoaded) {
+			methods.reset(recommendation, { keepDefaultValues: false, keepDirty: false });
+			const loadedSongRows = recommendation?.suggestions?.length > 0 ? recommendation?.suggestions.map((item) => item.id) : songRowsDefault;
 			setSongRows(loadedSongRows);
+			//This is to prevent the form from resetting data when we patch the record
+			setRecommendationLoaded(true);
 		}
-	}, [methods.reset, data, methods]);
+	}, [methods.reset, recommendation, methods, recommendationLoaded]);
 
 	/**
 	 * Save the record

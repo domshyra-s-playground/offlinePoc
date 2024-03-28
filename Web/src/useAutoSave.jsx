@@ -8,6 +8,8 @@ import { useBeforeUnload } from "react-router-dom";
 //3 seconds for local/dev, 60 seconds for prod
 const autoSaveInterval = isProdEnv() ? 60000 : 5000;
 
+//!Note, if you have a rkqMutation that is a changing your object make sure you are also not using a useEffect to update the object via rhf.setValue
+
 /**
  * Used to auto save a record every 60 seconds once methods.formState.isDirty is true and will use the rtkQueryMutation to save the record
  * @remarks Every value in the form needs registered with the useForm hook. In other words methods.getValues should return every value
@@ -111,7 +113,8 @@ async function autoSaveRecord(defaultValues, getValues, resetField, rtkQueryMuta
 		if (response.data) {
 			//Looks at each dirtyFields, touchedFields and defaultValues and resets to new values
 			console.log("saved these fields", operations);
-			const formIsStillDirty = resetUpdatedFields(valuesToSave, getValues, resetField, operations);
+			const valuesAfterSave = getValues();
+			const formIsStillDirty = resetUpdatedFields(valuesToSave, valuesAfterSave, resetField, operations);
 			var saveTime = new Date();
 			setToast({ show: true, message: `${recordName} saved at ${saveTime.toLocaleTimeString()}` });
 			setSavedAt(saveTime);
@@ -130,10 +133,8 @@ async function autoSaveRecord(defaultValues, getValues, resetField, rtkQueryMuta
  * @param {Array} operations
  * @returns
  */
-function resetUpdatedFields(valuesToSave, getValues, resetField, operations) {
+function resetUpdatedFields(valuesToSave, valuesAfterSave, resetField, operations) {
 	//if the field is different than when we save, keep that one dirty so we don't loose data, notes for example
-
-	const valuesAfterSave = getValues();
 	const inProgressOperations = jsonpatch.compare(valuesToSave, valuesAfterSave);
 	const inProgressFields = inProgressOperations.map((operation) => {
 		return getFieldNameFromOperation(operation);
