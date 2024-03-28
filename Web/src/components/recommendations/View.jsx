@@ -1,8 +1,8 @@
 import { recommendationsCreate, recommendationsForm } from "../../constants/routes";
 import { useDeleteRecommendationMutation, useGetRecommendationsQuery } from "../../redux/services/playlistRecommendationApi";
 
+import IndexDataGrid from "../subcomponets/dataGrids/IndexDataGrid";
 import React from "react";
-import StyledDataGrid from "../subcomponets/StyledDataGrid";
 import { recommendationsLabel } from "../../constants/labels";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
 
@@ -13,7 +13,7 @@ const ViewRecommendations = () => {
 	//Grab the genres from the Spotify API for offline use
 	useGetGenresQuery();
 	return (
-		<StyledDataGrid
+		<IndexDataGrid
 			columns={columns}
 			loading={isLoading}
 			singleton="Recommendation"
