@@ -23,6 +23,7 @@ There are a few examples of how this project has progressed or the other technol
 
 ### Form Items
 Here are some of the Form items in this application that demo basic CRUD operations. 
+The edit page should use patches to save changes to the server. If offline it will wait to save until the user is back online.
 ![image](https://github.com/domshyra-s-playground/baseRtkQueryApp/assets/1061957/80a2332c-c2f0-468f-b7c1-925bbfcd7d91)
 
 
