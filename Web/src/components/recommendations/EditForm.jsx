@@ -1,6 +1,6 @@
 import { Box, Container, FormHelperText, Grid, Paper, Typography } from "@mui/material";
-import { FormProvider, set, useForm } from "react-hook-form";
-import { RequiredFields, SongFields, SubmitButton, UnsavedChangesModal, songRowsDefault } from "./Form";
+import { FormProvider, useForm } from "react-hook-form";
+import { RequiredFields, SongFields, SubmitButton, UnsavedChangesModal } from "./Form";
 import { recommendationsForm, recommendationsRoot } from "../../constants/routes";
 import { useBlocker, useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
@@ -16,8 +16,8 @@ import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
 import useAutoSave from "../../useAutoSave";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
+import { v4 as uuidv4 } from "uuid";
 
-//TODO: add remove button to each row for song rather than a global remove button
 /**
  * EditRecommendationForm component. used for patches and offline save
  *
@@ -30,7 +30,7 @@ import { useGetGenresQuery } from "../../redux/services/spotifyApi";
 const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
 
-	const [songRows, setSongRows] = useState(songRowsDefault);
+	const [songRows, setSongRows] = useState([uuidv4()]);
 	const [showModal, setShowModal] = useState(false);
 	const [recommendationLoaded, setRecommendationLoaded] = useState(false);
 	const navigate = useNavigate();
@@ -75,7 +75,7 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 	useEffect(() => {
 		if (recommendation && !recommendationLoaded) {
 			methods.reset(recommendation, { keepDefaultValues: false, keepDirty: false });
-			const loadedSongRows = recommendation?.suggestions?.length > 0 ? recommendation?.suggestions.map((item) => item.id) : songRowsDefault;
+			const loadedSongRows = recommendation?.suggestions?.length > 0 ? recommendation?.suggestions.map((item) => item.id) : [uuidv4()];
 			setSongRows(loadedSongRows);
 			//This is to prevent the form from resetting data when we patch the record
 			setRecommendationLoaded(true);
@@ -141,7 +141,13 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 							</Grid>
 						</Box>
 					</Paper>
-					<SongFields songRows={songRows} setSongRows={setSongRows} isLoading={isLoading} setValue={methods.setValue} />
+					<SongFields
+						songRows={songRows}
+						setSongRows={setSongRows}
+						isLoading={isLoading}
+						setValue={methods.setValue}
+						getValues={methods.getValues}
+					/>
 					<LastSavedText savedAt={savedAt} key={savedAt} />
 					<Grid container direction="row" mt={0} py={2}>
 						<SubmitButton

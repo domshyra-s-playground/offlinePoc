@@ -30,7 +30,7 @@ namespace Repositories
 
         private static PlaylistRecommendationDto EntityToDetailDto(PlaylistRecommendationEntity entity)
         {
-            List<SongDto> suggestions = entity.Suggestions.Select(s => new SongDto(s.Id, s.PlaylistRecommendationEntityId, s.Title, s.Artist)).ToList();
+            List<SongDto> suggestions = entity.Suggestions.Select(s => new SongDto(s.Id, s.PlaylistRecommendationEntityId, s.Title, s.Artist)).OrderBy(x => x.Artist).ThenBy(x => x.Title).ToList();
             return new PlaylistRecommendationDto(entity.Id, entity.Name, entity.Description, entity.Genre, suggestions);
         }
 

@@ -15,6 +15,7 @@ import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
 import { useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * RecommendationForm component.
@@ -27,7 +28,7 @@ import { useUpsertRecommendationMutation } from "../../redux/services/playlistRe
  */
 const RecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
-	const [songRows, setSongRows] = useState(songRowsDefault);
+	const [songRows, setSongRows] = useState([uuidv4()]);
 	const [showModal, setShowModal] = useState(false);
 	const navigate = useNavigate();
 	const methods = useForm({
@@ -107,7 +108,13 @@ const RecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) =
 							</Grid>
 						</Box>
 					</Paper>
-					<SongFields control={methods.control} songRows={songRows} setSongRows={setSongRows} setValue={methods.setValue} />
+					<SongFields
+						control={methods.control}
+						songRows={songRows}
+						setSongRows={setSongRows}
+						setValue={methods.setValue}
+						getValues={methods.getValues}
+					/>
 					<Grid container direction="row" mt={0} py={2}>
 						<SubmitButton
 							isCreateMode={true}
@@ -126,11 +133,11 @@ const RecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) =
 	);
 };
 
-const SongFields = ({ control, songRows, setSongRows, setValue }) => {
+const SongFields = ({ control, songRows, setSongRows, setValue, getValues }) => {
 	const removeRow = (guid, index) => {
-		const updatedRows = [...songRows].filter((item) => item.id !== guid);
-		setValue(`suggestions[${index}].title`, "");
-		setValue(`suggestions[${index}].artist`, "");
+		const updatedRows = [...songRows].filter((id) => id !== guid);
+		const newRhfValues = getValues("suggestions").filter((item) => item.id !== guid);
+		setValue(`suggestions`, newRhfValues);
 		setSongRows(updatedRows);
 	};
 
@@ -156,41 +163,6 @@ const SongFields = ({ control, songRows, setSongRows, setValue }) => {
 		</Paper>
 	);
 };
-
-/**
- * Memoized JSX element representing the required fields in the form.
- * Both Name and Genre are required fields.
- * @type {JSX.Element}
- */
-const RequiredFields = ({ genres, genresAreLoading, isLoading, control }) => {
-	return (
-		<>
-			<Grid item xs={8}>
-				<GenericTextItem
-					name="name"
-					label="Name"
-					id="name"
-					rules={{ required: "Name is required." }}
-					customControl={control}
-					isLoading={isLoading}
-				/>
-			</Grid>
-			<Grid item xs={4}>
-				<SelectItem
-					name="genre"
-					label="Genre"
-					id="genre"
-					showLabel
-					rules={{ required: "Genre is required." }}
-					customControl={control}
-					isLoading={genresAreLoading}
-					options={genres}
-				/>
-			</Grid>
-		</>
-	);
-};
-
 /**
  * Represents a list of songs.
  * @type {React.ReactNode}
@@ -198,7 +170,7 @@ const RequiredFields = ({ genres, genresAreLoading, isLoading, control }) => {
 const Songs = ({ isLoading, control, songRows, removeRow }) => {
 	const songRow = (index, guid) => {
 		return (
-			<Grid container direction="row" spacing={2} key={guid}>
+			<Grid container direction="row" spacing={2} key={`${index}-${guid}`}>
 				<Grid item xs={5}>
 					<GenericTextItem
 						name={`suggestions[${index}].title`}
@@ -239,11 +211,45 @@ const Songs = ({ isLoading, control, songRows, removeRow }) => {
 
 	const songSection = [];
 	for (let i = 0; i < songRows.length; i++) {
-		const mainId = songRows[i].id;
-		songSection.push(songRow(i, mainId ?? i));
+		const mainId = songRows[i];
+		songSection.push(songRow(i, mainId));
 	}
 
 	return songSection;
+};
+
+/**
+ * Memoized JSX element representing the required fields in the form.
+ * Both Name and Genre are required fields.
+ * @type {JSX.Element}
+ */
+const RequiredFields = ({ genres, genresAreLoading, isLoading, control }) => {
+	return (
+		<>
+			<Grid item xs={8}>
+				<GenericTextItem
+					name="name"
+					label="Name"
+					id="name"
+					rules={{ required: "Name is required." }}
+					customControl={control}
+					isLoading={isLoading}
+				/>
+			</Grid>
+			<Grid item xs={4}>
+				<SelectItem
+					name="genre"
+					label="Genre"
+					id="genre"
+					showLabel
+					rules={{ required: "Genre is required." }}
+					customControl={control}
+					isLoading={genresAreLoading}
+					options={genres}
+				/>
+			</Grid>
+		</>
+	);
 };
 
 /**
@@ -382,15 +388,13 @@ const AddSongRowButton = ({ setSongRows, songRows }) => {
 				variant="outlined"
 				size="small"
 				startIcon={<AddIcon />}
-				onClick={() => setSongRows([songRowsDefault[0], ...songRows])}
+				onClick={() => setSongRows([uuidv4(), ...songRows])}
 			>
 				Add Song Row
 			</Button>
 		</Grid>
 	);
 };
-
-const songRowsDefault = ["00000000-0000-0000-0000-000000000000"];
 
 function mapStateToProps(state) {
 	return {
@@ -405,4 +409,4 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RecommendationForm);
-export { RequiredFields, Songs, SubmitButton, UnsavedChangesModal, AddSongRowButton, SongFields, songRowsDefault };
+export { RequiredFields, Songs, SubmitButton, UnsavedChangesModal, AddSongRowButton, SongFields };
