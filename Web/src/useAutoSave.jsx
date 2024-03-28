@@ -5,13 +5,13 @@ import { useCallback, useEffect, useState } from "react";
 import { isProdEnv } from "./config";
 import { useBeforeUnload } from "react-router-dom";
 
-//3 seconds for local/dev, 60 seconds for prod
-const autoSaveInterval = isProdEnv() ? 60000 : 5000;
+//3 seconds for local/dev, 10 seconds for deployed
+const autoSaveInterval = isProdEnv() ? 10000 : 3000;
 
 //!Note, if you have a rkqMutation that is a changing your object make sure you are also not using a useEffect to update the object via rhf.setValue
 
 /**
- * Used to auto save a record every 60 seconds once methods.formState.isDirty is true and will use the rtkQueryMutation to save the record
+ * Used to auto save a record every 10 seconds once methods.formState.isDirty is true and will use the rtkQueryMutation to save the record
  * @remarks Every value in the form needs registered with the useForm hook. In other words methods.getValues should return every value
  * needing to be saved in the backend.
  * @param {object} defaultValues methods.formState.defaultValues
