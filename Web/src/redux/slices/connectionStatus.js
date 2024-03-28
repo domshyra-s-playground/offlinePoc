@@ -14,7 +14,8 @@ const connectionStatus = createSlice({
 				...state,
 				online: true,
 				previousOnline: state.online,
-				onlineAt: new Date().toLocaleString(),
+				onlineAt: new Date(),
+				onlineAtDisplay: new Date().toLocaleString(),
 			};
 		},
 		setOffline: (state, _) => {
@@ -22,7 +23,8 @@ const connectionStatus = createSlice({
 				...state,
 				online: false,
 				previousOnline: state.online,
-				offlineAt: new Date().toLocaleString(),
+				offlineAt: new Date(),
+				offlineAtDisplay: new Date().toLocaleString(),
 			};
 		},
 	},

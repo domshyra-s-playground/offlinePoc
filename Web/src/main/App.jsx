@@ -1,5 +1,6 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
+import EditRecommendationForm from "../components/recommendations/EditForm";
 import Layout from "./Layout";
 import PlaylistDetails from "../components/playlists/PlaylistDetails";
 import RecommendationForm from "../components/recommendations/Form";
@@ -23,7 +24,7 @@ const router = createBrowserRouter([
 				children: [
 					{ index: true, Component: ViewRecommendations },
 					{ path: "create", Component: RecommendationForm },
-					{ path: "form/:id", Component: RecommendationForm },
+					{ path: "form/:id", Component: EditRecommendationForm },
 				],
 			},
 		],

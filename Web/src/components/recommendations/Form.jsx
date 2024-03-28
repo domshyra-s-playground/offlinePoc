@@ -1,9 +1,8 @@
-import { Alert, AlertTitle, Box, Button, Container, Grid, Paper, Typography } from "@mui/material";
+import { Alert, AlertTitle, Box, Button, Container, FormHelperText, Grid, Paper, Stack, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { recommendationsForm, recommendationsRoot } from "../../constants/routes";
-import { useBlocker, useNavigate, useParams } from "react-router-dom";
+import { useBlocker, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useGetRecommendationQuery, useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
 
 import AddIcon from "@mui/icons-material/Add";
 import ConfirmationModal from "../subcomponets/modals/ConfirmationModal";
@@ -15,8 +14,9 @@ import SelectItem from "../subcomponets/SelectItem";
 import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
+import { useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
+import { v4 as uuidv4 } from "uuid";
 
-//TODO: add remove button to each row for song rather than a global remove button
 /**
  * RecommendationForm component.
  *
@@ -26,14 +26,11 @@ import { useGetGenresQuery } from "../../redux/services/spotifyApi";
  * @param {boolean} props.online - Flag indicating if the user is online.
  * @returns {JSX.Element} RecommendationForm component.
  */
-const RecommendationForm = ({ setToast, online }) => {
+const RecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
-	const songRowsDefault = 1;
-	const [songRows, setSongRows] = useState(songRowsDefault);
+	const [songRows, setSongRows] = useState([uuidv4()]);
 	const [showModal, setShowModal] = useState(false);
 	const navigate = useNavigate();
-
-	const params = useParams();
 	const methods = useForm({
 		mode: "onChange",
 	});
@@ -41,10 +38,6 @@ const RecommendationForm = ({ setToast, online }) => {
 		formState: { isDirty, isValid },
 	} = methods;
 
-	const { id } = params;
-	const isCreateMode = id === undefined;
-
-	const { data, isLoading } = useGetRecommendationQuery(id, { skip: isCreateMode });
 	const { data: genres, isLoading: genresAreLoading } = useGetGenresQuery();
 
 	const [upsertRecommendation] = useUpsertRecommendationMutation();
@@ -57,13 +50,6 @@ const RecommendationForm = ({ setToast, online }) => {
 		setShowModal(blocker.state === "blocked");
 	}, [blocker.state]);
 
-	useEffect(() => {
-		if (data) {
-			methods.reset(data, { keepIsValid: false });
-			setSongRows(data?.suggestions?.length > 0 ? data?.suggestions?.length : songRowsDefault);
-		}
-	}, [methods.reset, data, methods]);
-
 	/**
 	 * Save the record
 	 * @param {*} form
@@ -71,7 +57,7 @@ const RecommendationForm = ({ setToast, online }) => {
 	const onFormSubmit = useCallback(
 		(form) => {
 			setShowLoadingButton(true);
-			upsertRecommendation({ data: form, isCreateMode })
+			upsertRecommendation({ data: form, isCreateMode: true })
 				.then((response) => {
 					console.log(response);
 					if (response.error) {
@@ -80,7 +66,7 @@ const RecommendationForm = ({ setToast, online }) => {
 					}
 					setToast({
 						show: true,
-						message: isCreateMode ? "Recommendation created." : "Recommendation saved.",
+						message: "Recommendation created.",
 						link: `${recommendationsForm}${response.data.id}`,
 					});
 					navigate(recommendationsRoot);
@@ -92,7 +78,7 @@ const RecommendationForm = ({ setToast, online }) => {
 					setShowLoadingButton(false);
 				});
 		},
-		[upsertRecommendation, isCreateMode, setToast, navigate]
+		[upsertRecommendation, setToast, navigate]
 	);
 
 	return (
@@ -100,13 +86,13 @@ const RecommendationForm = ({ setToast, online }) => {
 			{showModal ? <UnsavedChangesModal key={showModal ? "unsaved-changes" : ""} blocker={blocker} setShowModal={setShowModal} /> : null}
 			<FormProvider key="fireStationForm" {...methods}>
 				<Typography variant="h5" gutterBottom>
-					{isCreateMode ? "Create" : "Edit"} Recommendation
+					Create Recommendation
 				</Typography>
 				<Box key="bcegsFormBox" component="form" noValidate autoComplete="off" onSubmit={methods.handleSubmit(onFormSubmit)}>
 					<Paper elevation={2}>
 						<Box p={2} mb={2}>
 							<Grid container direction="row" spacing={2}>
-								<RequiredFields genres={genres} genresAreLoading={genresAreLoading} isLoading={isLoading} control={methods.control} />
+								<RequiredFields genres={genres} genresAreLoading={genresAreLoading} control={methods.control} />
 							</Grid>
 							<Grid container direction="row" spacing={2} py={1}>
 								<Grid item xs={12}>
@@ -115,7 +101,6 @@ const RecommendationForm = ({ setToast, online }) => {
 										label="Description"
 										id="description"
 										customControl={methods.control}
-										isLoading={isLoading}
 										multiline
 										fullWidth
 									/>
@@ -123,32 +108,21 @@ const RecommendationForm = ({ setToast, online }) => {
 							</Grid>
 						</Box>
 					</Paper>
-					<Paper elevation={1}>
-						<Box p={2}>
-							<Typography variant="h5" py={1} gutterBottom>
-								Songs
-							</Typography>
-							<Grid container direction="row" justifyContent={"center"} spacing={2}>
-								<AddSongRowButton setSongRows={setSongRows} songRows={songRows} />
-								<RemoveSongRowButton setSongRows={setSongRows} songRows={songRows} />
-							</Grid>
-							<Grid container direction="row" py={2} px={2}>
-								<Grid item xs={6}>
-									<Typography variant="h6">Title</Typography>
-								</Grid>
-								<Grid item xs={6}>
-									<Typography variant="h6">Artist</Typography>
-								</Grid>
-								<Songs isLoading={isLoading} control={methods.control} songRows={songRows} />
-							</Grid>
-						</Box>
-					</Paper>
+					<SongFields
+						control={methods.control}
+						songRows={songRows}
+						setSongRows={setSongRows}
+						setValue={methods.setValue}
+						getValues={methods.getValues}
+					/>
 					<Grid container direction="row" mt={0} py={2}>
 						<SubmitButton
-							isCreateMode={isCreateMode}
+							isCreateMode={true}
 							isDirty={isDirty}
 							isValid={isValid}
 							online={online}
+							offlineAt={offlineAt}
+							offlineAtDisplay={offlineAtDisplay}
 							showLoadingButton={showLoadingButton}
 						/>
 					</Grid>
@@ -157,6 +131,91 @@ const RecommendationForm = ({ setToast, online }) => {
 			</FormProvider>
 		</Container>
 	);
+};
+
+const SongFields = ({ control, songRows, setSongRows, setValue, getValues }) => {
+	const removeRow = (guid) => {
+		const updatedRows = [...songRows].filter((id) => id !== guid);
+		const newRhfValues = getValues("suggestions").filter((item) => item.id !== guid);
+		setValue(`suggestions`, newRhfValues);
+		setSongRows(updatedRows);
+	};
+
+	return (
+		<Paper elevation={1}>
+			<Box p={2}>
+				<Typography variant="h5" py={1} gutterBottom>
+					Songs
+				</Typography>
+				<Grid container direction="row" justifyContent={"center"} spacing={2}>
+					<AddSongRowButton setSongRows={setSongRows} songRows={songRows} />
+				</Grid>
+				<Grid container direction="row" py={2} px={2}>
+					<Grid item xs={6}>
+						<Typography variant="h6">Title</Typography>
+					</Grid>
+					<Grid item xs={6}>
+						<Typography variant="h6">Artist</Typography>
+					</Grid>
+					<Songs control={control} songRows={songRows} removeRow={removeRow} />
+				</Grid>
+			</Box>
+		</Paper>
+	);
+};
+/**
+ * Represents a list of songs.
+ * @type {React.ReactNode}
+ */
+const Songs = ({ isLoading, control, songRows, removeRow }) => {
+	const songRow = (index, guid) => {
+		return (
+			<Grid container direction="row" spacing={2} key={`${index}-${guid}`}>
+				<Grid item xs={5}>
+					<GenericTextItem
+						name={`suggestions[${index}].title`}
+						id={`suggestions[${index}].title`}
+						customControl={control}
+						fullWidth
+						isLoading={isLoading}
+					/>
+				</Grid>
+				<Grid item xs={5}>
+					<GenericTextItem
+						name={`suggestions[${index}].artist`}
+						id={`suggestions[${index}].artist`}
+						customControl={control}
+						fullWidth
+						isLoading={isLoading}
+					/>
+				</Grid>
+				<Grid item xs={2}>
+					<Button
+						key="removeSongRow"
+						id={`remove-song-row-btn-${index}`}
+						type="button"
+						color="primary"
+						variant="outlined"
+						size="small"
+						startIcon={<RemoveIcon />}
+						onClick={() => {
+							removeRow(guid);
+						}}
+					>
+						Remove
+					</Button>
+				</Grid>
+			</Grid>
+		);
+	};
+
+	const songSection = [];
+	for (let i = 0; i < songRows.length; i++) {
+		const mainId = songRows[i];
+		songSection.push(songRow(i, mainId));
+	}
+
+	return songSection;
 };
 
 /**
@@ -194,49 +253,13 @@ const RequiredFields = ({ genres, genresAreLoading, isLoading, control }) => {
 };
 
 /**
- * Represents a list of songs.
- * @type {React.ReactNode}
- */
-const Songs = ({ isLoading, control, songRows }) => {
-	const songRow = (index) => {
-		return (
-			<Grid container direction="row" spacing={2} key={index}>
-				<Grid item xs={6}>
-					<GenericTextItem
-						name={`suggestions[${index}].title`}
-						id={`suggestions[${index}].title`}
-						customControl={control}
-						fullWidth
-						isLoading={isLoading}
-					/>
-				</Grid>
-				<Grid item xs={6}>
-					<GenericTextItem
-						name={`suggestions[${index}].artist`}
-						id={`suggestions[${index}].artist`}
-						customControl={control}
-						fullWidth
-						isLoading={isLoading}
-					/>
-				</Grid>
-			</Grid>
-		);
-	};
-
-	const songSection = [];
-	for (let i = 0; i < songRows; i++) {
-		songSection.push(songRow(i));
-	}
-
-	return songSection;
-};
-
-/**
  * The submit button component.
  *
  * @returns {JSX.Element} The submit button JSX element.
  */
-const SubmitButton = ({ isCreateMode, isDirty, isValid, online, showLoadingButton }) => {
+const SubmitButton = ({ isCreateMode, isDirty, isValid, online, offlineAt, offlineAtDisplay, showLoadingButton, lastSaved }) => {
+	const formIsModified = isDirty || !isValid;
+
 	const btnText = () => {
 		if (!online) {
 			return "Offline";
@@ -250,23 +273,58 @@ const SubmitButton = ({ isCreateMode, isDirty, isValid, online, showLoadingButto
 		if (!online) {
 			return true;
 		}
+		if (!isCreateMode && online && offlineAt && formIsModified) {
+			//show save button only after we have been offline and the form is dirty
+			return true;
+		}
+
 		return !isDirty || !isValid;
 	};
+	const showButton = (offlineAt && online && formIsModified && lastSaved > offlineAt) || isCreateMode;
+
+	if (!isCreateMode && !offlineAt) {
+		return null;
+	}
 
 	return (
-		<LoadingButton
-			key="bcegsSubmit"
-			id="submit-form-btn"
-			type="submit"
-			color="primary"
-			variant="contained"
-			loading={showLoadingButton}
-			disabled={btnDisabled()}
-		>
-			{btnText()}
-		</LoadingButton>
+		<>
+			<Stack spacing={2}>
+				<SubmitButtonHelperText online={online} offlineAt={offlineAt} offlineAtDisplay={offlineAtDisplay} lastSaved={showButton} />
+			</Stack>
+			{showButton ? (
+				<LoadingButton
+					key="bcegsSubmit"
+					id="submit-form-btn"
+					type="submit"
+					color="primary"
+					variant="contained"
+					loading={showLoadingButton}
+					disabled={btnDisabled()}
+				>
+					{btnText()}
+				</LoadingButton>
+			) : null}
+		</>
 	);
 };
+
+const SubmitButtonHelperText = ({ online, offlineAt, offlineAtDisplay, showButton }) => {
+	return (
+		<>
+			{offlineAt && !online ? (
+				<FormHelperText sx={{ textAlign: "left" }} pb={0}>
+					You have went offline, we cannot auto save.
+				</FormHelperText>
+			) : null}
+			{showButton ? (
+				<FormHelperText sx={{ textAlign: "left" }} pb={0}>
+					You have went back online, we have haven't saved since {offlineAtDisplay}. Please hit save when ready.
+				</FormHelperText>
+			) : null}
+		</>
+	);
+};
+
 /**
  * The modal component used for displaying a confirmation dialog.
  *
@@ -330,33 +388,9 @@ const AddSongRowButton = ({ setSongRows, songRows }) => {
 				variant="outlined"
 				size="small"
 				startIcon={<AddIcon />}
-				onClick={() => setSongRows(songRows + 1)}
+				onClick={() => setSongRows([uuidv4(), ...songRows])}
 			>
 				Add Song Row
-			</Button>
-		</Grid>
-	);
-};
-
-/**
- * Button component for removing a song row.
- *
- * @type {React.ReactNode}
- */
-const RemoveSongRowButton = ({ setSongRows, songRows }) => {
-	return (
-		<Grid item>
-			<Button
-				key="addSongRow"
-				id="add-song-row-btn"
-				type="button"
-				color="primary"
-				variant="outlined"
-				size="small"
-				startIcon={<RemoveIcon />}
-				onClick={() => setSongRows(songRows - 1)}
-			>
-				Remove Song Row
 			</Button>
 		</Grid>
 	);
@@ -365,6 +399,8 @@ const RemoveSongRowButton = ({ setSongRows, songRows }) => {
 function mapStateToProps(state) {
 	return {
 		online: state.connectionStatus.online,
+		offlineAt: state.connectionStatus.offlineAt,
+		offlineAtDisplay: state.connectionStatus.offlineAtDisplay,
 	};
 }
 
@@ -373,4 +409,4 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RecommendationForm);
-export { RequiredFields, Songs, SubmitButton, UnsavedChangesModal, AddSongRowButton, RemoveSongRowButton };
+export { RequiredFields, Songs, SubmitButton, UnsavedChangesModal, AddSongRowButton, SongFields };
