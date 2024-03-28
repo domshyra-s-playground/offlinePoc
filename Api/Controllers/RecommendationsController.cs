@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Controllers
 {
-    [Route("api/[controller]")]
+    [Route("recommendations")]
     [ApiController]
     public class RecommendationsController : ControllerBase
     {
@@ -38,8 +38,8 @@ namespace Controllers
             return Ok(recommendation);
         }
 
-        // PUT: api/Recommendations/5
-        [HttpPut("{id}")]
+        // PUT: api/Recommendations
+        [HttpPut]
         public async Task<IActionResult> PutRecommendationAsync([FromBody] PlaylistRecommendationDto recommendation)
         {
             var existingRecord = await _repository.GetRecommendation(recommendation.Id.ToString());
@@ -49,14 +49,13 @@ namespace Controllers
 
             }
 
-
             var updatedRecord = await _repository.UpdateRecommendation(recommendation);
             return Ok(updatedRecord);
         }
 
         // POST: api/Recommendations
         [HttpPost]
-        public async Task<ActionResult<PlaylistRecommendationDto>> PostRecommendationAsync(PlaylistRecommendationDto recommendation)
+        public async Task<ActionResult<PlaylistRecommendationDto>> PostRecommendationAsync([FromBody] PlaylistRecommendationDto recommendation)
         {
             var newRecord = await _repository.AddRecommendation(recommendation);
 
