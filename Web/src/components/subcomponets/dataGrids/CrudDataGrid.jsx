@@ -11,11 +11,12 @@ import { connect } from "react-redux";
 import { setToast } from "../../../redux/slices/toast";
 
 /**
- * Index Data Grid component
+ * Crud Data Grid component
+ * create, read, update, delete data grid component. Delete has a modal confirmation.
  * @param {*} props
  * @returns
  */
-const IndexDataGrid = (props) => {
+const CrudDataGrid = (props) => {
 	const ref = useRef(null);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [selectedRecordId, setSelectedRecordId] = useState(null);
@@ -86,7 +87,7 @@ const IndexDataGrid = (props) => {
 	);
 };
 
-IndexDataGrid.prototypes = {
+CrudDataGrid.prototypes = {
 	/**
 	 * The columns to be displayed in the grid.
 	 */
@@ -188,4 +189,4 @@ const mapDispatchToProps = {
 	setToast,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(IndexDataGrid);
+export default connect(mapStateToProps, mapDispatchToProps)(CrudDataGrid);
