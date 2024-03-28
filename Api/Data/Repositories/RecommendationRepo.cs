@@ -56,9 +56,7 @@ namespace Repositories
 
         public async Task<PlaylistRecommendationDto> UpdateRecommendation(PlaylistRecommendationDto recommendation)
         {
-            var entity = await _context.Recommendations.Include(x => x.Suggestions).SingleOrDefaultAsync(h => h.Id == recommendation.Id);
-            if (entity == null)
-                throw new Exception($"Recommendation with id {recommendation.Id} not found");
+            var entity = await _context.Recommendations.Include(x => x.Suggestions).SingleOrDefaultAsync(h => h.Id == recommendation.Id) ?? throw new Exception($"Recommendation with id {recommendation.Id} not found");
             entity.Description = recommendation.Description;
             entity.Name = recommendation.Name;
             entity.Genre = recommendation.Genre;
@@ -73,6 +71,10 @@ namespace Repositories
             //add new suggestions
             foreach (var suggestion in recommendation.Suggestions)
             {
+                if (string.IsNullOrWhiteSpace(suggestion.Title) || string.IsNullOrWhiteSpace(suggestion.Artist))
+                {
+                    continue;
+                }
                 var song = new SongEntity { Id = Guid.NewGuid(), PlaylistRecommendationEntityId = recommendation.Id, Title = suggestion.Title, Artist = suggestion.Artist };
                 entity.Suggestions.Add(song);
                 _context.Entry(song).State = EntityState.Added;
