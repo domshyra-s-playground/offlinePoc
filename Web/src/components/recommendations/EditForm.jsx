@@ -1,14 +1,9 @@
 import { Box, Container, FormHelperText, Grid, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import { RequiredFields, SongFields, SubmitButton, UnsavedChangesModal } from "./Form";
-import { recommendationsForm, recommendationsRoot } from "../../constants/routes";
-import { useBlocker, useNavigate, useParams } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
-import {
-	useGetRecommendationQuery,
-	usePatchRecommendationMutation,
-	useUpsertRecommendationMutation,
-} from "../../redux/services/playlistRecommendationApi";
+import { RequiredFields, SongFields, UnsavedChangesModal } from "./Form";
+import { useBlocker, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useGetRecommendationQuery, usePatchRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
 
 import { DevTool } from "@hookform/devtools";
 import GenericTextItem from "../subcomponets/GenericTextItem";
@@ -27,20 +22,17 @@ import { v4 as uuidv4 } from "uuid";
  * @param {boolean} props.online - Flag indicating if the user is online.
  * @returns {JSX.Element} RecommendationForm component.
  */
-const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) => {
-	const [showLoadingButton, setShowLoadingButton] = useState(false);
-
+const EditRecommendationForm = ({ setToast, online }) => {
 	const [songRows, setSongRows] = useState([uuidv4()]);
 	const [showModal, setShowModal] = useState(false);
 	const [recommendationLoaded, setRecommendationLoaded] = useState(false);
-	const navigate = useNavigate();
 
 	const params = useParams();
 	const methods = useForm({
 		mode: "onChange",
 	});
 	const {
-		formState: { isDirty, isValid },
+		formState: { isDirty },
 	} = methods;
 
 	const { id } = params;
@@ -48,7 +40,6 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 	const { data: recommendation, isLoading } = useGetRecommendationQuery(id);
 	const { data: genres, isLoading: genresAreLoading } = useGetGenresQuery();
 
-	const [upsertRecommendation] = useUpsertRecommendationMutation();
 	const [patchRecommendation] = usePatchRecommendationMutation();
 
 	//https://reactrouter.com/en/main/hooks/use-blocker
@@ -82,37 +73,6 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 		}
 	}, [methods.reset, recommendation, methods, recommendationLoaded]);
 
-	/**
-	 * Save the record
-	 * @param {*} form
-	 */
-	const onFormSubmit = useCallback(
-		(form) => {
-			setShowLoadingButton(true);
-			upsertRecommendation({ data: form, isCreateMode: false })
-				.then((response) => {
-					console.log(response);
-					if (response.error) {
-						setToast({ show: true, message: "Error saving recommendation.", isError: true });
-						return;
-					}
-					setToast({
-						show: true,
-						message: "Recommendation saved.",
-						link: `${recommendationsForm}${response.data.id}`,
-					});
-					navigate(recommendationsRoot);
-				})
-				.catch((error) => {
-					console.log(error);
-				})
-				.finally(() => {
-					setShowLoadingButton(false);
-				});
-		},
-		[upsertRecommendation, setToast, navigate]
-	);
-
 	return (
 		<Container>
 			{showModal ? <UnsavedChangesModal key={showModal ? "unsaved-changes" : ""} blocker={blocker} setShowModal={setShowModal} /> : null}
@@ -120,7 +80,7 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 				<Typography variant="h5" gutterBottom>
 					Edit Recommendation
 				</Typography>
-				<Box key="bcegsFormBox" component="form" noValidate autoComplete="off" onSubmit={methods.handleSubmit(onFormSubmit)}>
+				<Box key="bcegsFormBox" component="form" noValidate autoComplete="off">
 					<Paper elevation={2}>
 						<Box p={2} mb={2}>
 							<Grid container direction="row" spacing={2}>
@@ -149,18 +109,6 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 						getValues={methods.getValues}
 					/>
 					<LastSavedText savedAt={savedAt} key={savedAt} />
-					<Grid container direction="row" mt={0} py={2}>
-						<SubmitButton
-							isCreateMode={false}
-							isDirty={isDirty}
-							isValid={isValid}
-							online={online}
-							offlineAt={offlineAt}
-							offlineAtDisplay={offlineAtDisplay}
-							showLoadingButton={showLoadingButton}
-							lastSaved={savedAt}
-						/>
-					</Grid>
 					<DevTool control={methods.control} />
 				</Box>
 			</FormProvider>
