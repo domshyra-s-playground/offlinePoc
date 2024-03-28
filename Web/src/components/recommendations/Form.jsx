@@ -1,9 +1,8 @@
 import { Alert, AlertTitle, Box, Button, Container, FormHelperText, Grid, Paper, Stack, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { recommendationsForm, recommendationsRoot } from "../../constants/routes";
-import { useBlocker, useNavigate, useParams } from "react-router-dom";
+import { useBlocker, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useGetRecommendationQuery, useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
 
 import AddIcon from "@mui/icons-material/Add";
 import ConfirmationModal from "../subcomponets/modals/ConfirmationModal";
@@ -15,6 +14,7 @@ import SelectItem from "../subcomponets/SelectItem";
 import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
+import { useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
 
 //TODO: add remove button to each row for song rather than a global remove button
 /**
@@ -28,20 +28,15 @@ import { useGetGenresQuery } from "../../redux/services/spotifyApi";
  */
 const RecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
-	const songRowsDefault = 1;
 	const [songRows, setSongRows] = useState(songRowsDefault);
 	const [showModal, setShowModal] = useState(false);
 	const navigate = useNavigate();
-
-	const params = useParams();
 	const methods = useForm({
 		mode: "onChange",
 	});
 	const {
 		formState: { isDirty, isValid },
 	} = methods;
-
-	const { id } = params;
 
 	const { data: genres, isLoading: genresAreLoading } = useGetGenresQuery();
 
@@ -113,26 +108,7 @@ const RecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) =
 							</Grid>
 						</Box>
 					</Paper>
-					<Paper elevation={1}>
-						<Box p={2}>
-							<Typography variant="h5" py={1} gutterBottom>
-								Songs
-							</Typography>
-							<Grid container direction="row" justifyContent={"center"} spacing={2}>
-								<AddSongRowButton setSongRows={setSongRows} songRows={songRows} />
-								<RemoveSongRowButton setSongRows={setSongRows} songRows={songRows} />
-							</Grid>
-							<Grid container direction="row" py={2} px={2}>
-								<Grid item xs={6}>
-									<Typography variant="h6">Title</Typography>
-								</Grid>
-								<Grid item xs={6}>
-									<Typography variant="h6">Artist</Typography>
-								</Grid>
-								<Songs control={methods.control} songRows={songRows} />
-							</Grid>
-						</Box>
-					</Paper>
+					<SongFields control={methods.control} songRows={songRows} setSongRows={setSongRows} setValue={methods.setValue} />
 					<Grid container direction="row" mt={0} py={2}>
 						<SubmitButton
 							isCreateMode={true}
@@ -148,6 +124,37 @@ const RecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) =
 				</Box>
 			</FormProvider>
 		</Container>
+	);
+};
+
+const SongFields = ({ control, songRows, setSongRows, setValue }) => {
+	const removeRow = (guid, index) => {
+		const updatedRows = [...songRows].filter((item) => item.id !== guid);
+		setValue(`suggestions[${index}].title`, "");
+		setValue(`suggestions[${index}].artist`, "");
+		setSongRows(updatedRows);
+	};
+
+	return (
+		<Paper elevation={1}>
+			<Box p={2}>
+				<Typography variant="h5" py={1} gutterBottom>
+					Songs
+				</Typography>
+				<Grid container direction="row" justifyContent={"center"} spacing={2}>
+					<AddSongRowButton setSongRows={setSongRows} songRows={songRows} />
+				</Grid>
+				<Grid container direction="row" py={2} px={2}>
+					<Grid item xs={6}>
+						<Typography variant="h6">Title</Typography>
+					</Grid>
+					<Grid item xs={6}>
+						<Typography variant="h6">Artist</Typography>
+					</Grid>
+					<Songs control={control} songRows={songRows} removeRow={removeRow} />
+				</Grid>
+			</Box>
+		</Paper>
 	);
 };
 
@@ -189,11 +196,11 @@ const RequiredFields = ({ genres, genresAreLoading, isLoading, control }) => {
  * Represents a list of songs.
  * @type {React.ReactNode}
  */
-const Songs = ({ isLoading, control, songRows }) => {
-	const songRow = (index) => {
+const Songs = ({ isLoading, control, songRows, removeRow }) => {
+	const songRow = (index, guid) => {
 		return (
-			<Grid container direction="row" spacing={2} key={index}>
-				<Grid item xs={6}>
+			<Grid container direction="row" spacing={2} key={guid}>
+				<Grid item xs={5}>
 					<GenericTextItem
 						name={`suggestions[${index}].title`}
 						id={`suggestions[${index}].title`}
@@ -202,7 +209,7 @@ const Songs = ({ isLoading, control, songRows }) => {
 						isLoading={isLoading}
 					/>
 				</Grid>
-				<Grid item xs={6}>
+				<Grid item xs={5}>
 					<GenericTextItem
 						name={`suggestions[${index}].artist`}
 						id={`suggestions[${index}].artist`}
@@ -211,13 +218,30 @@ const Songs = ({ isLoading, control, songRows }) => {
 						isLoading={isLoading}
 					/>
 				</Grid>
+				<Grid item xs={2}>
+					<Button
+						key="removeSongRow"
+						id={`remove-song-row-btn-${index}`}
+						type="button"
+						color="primary"
+						variant="outlined"
+						size="small"
+						startIcon={<RemoveIcon />}
+						onClick={() => {
+							removeRow(guid, index);
+						}}
+					>
+						Remove
+					</Button>
+				</Grid>
 			</Grid>
 		);
 	};
 
 	const songSection = [];
-	for (let i = 0; i < songRows; i++) {
-		songSection.push(songRow(i));
+	for (let i = 0; i < songRows.length; i++) {
+		const mainId = songRows[i].id;
+		songSection.push(songRow(i, mainId ?? i));
 	}
 
 	return songSection;
@@ -251,7 +275,7 @@ const SubmitButton = ({ isCreateMode, isDirty, isValid, online, offlineAt, offli
 
 		return !isDirty || !isValid;
 	};
-	const showButton = offlineAt && online && formIsModified && lastSaved > offlineAt;
+	const showButton = (offlineAt && online && formIsModified && lastSaved > offlineAt) || isCreateMode;
 
 	if (!isCreateMode && !offlineAt) {
 		return null;
@@ -359,7 +383,7 @@ const AddSongRowButton = ({ setSongRows, songRows }) => {
 				variant="outlined"
 				size="small"
 				startIcon={<AddIcon />}
-				onClick={() => setSongRows(songRows + 1)}
+				onClick={() => setSongRows([songRowsDefault[0], ...songRows])}
 			>
 				Add Song Row
 			</Button>
@@ -367,29 +391,7 @@ const AddSongRowButton = ({ setSongRows, songRows }) => {
 	);
 };
 
-/**
- * Button component for removing a song row.
- *
- * @type {React.ReactNode}
- */
-const RemoveSongRowButton = ({ setSongRows, songRows }) => {
-	return (
-		<Grid item>
-			<Button
-				key="addSongRow"
-				id="add-song-row-btn"
-				type="button"
-				color="primary"
-				variant="outlined"
-				size="small"
-				startIcon={<RemoveIcon />}
-				onClick={() => setSongRows(songRows - 1)}
-			>
-				Remove Song Row
-			</Button>
-		</Grid>
-	);
-};
+const songRowsDefault = ["00000000-0000-0000-0000-000000000000"];
 
 function mapStateToProps(state) {
 	return {
@@ -404,4 +406,4 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RecommendationForm);
-export { RequiredFields, Songs, SubmitButton, UnsavedChangesModal, AddSongRowButton, RemoveSongRowButton };
+export { RequiredFields, Songs, SubmitButton, UnsavedChangesModal, AddSongRowButton, SongFields, songRowsDefault };

@@ -1,6 +1,6 @@
-import { AddSongRowButton, RemoveSongRowButton, RequiredFields, Songs, SubmitButton, UnsavedChangesModal } from "./Form";
-import { Box, Container, Grid, Paper, Typography } from "@mui/material";
+import { Box, Container, FormHelperText, Grid, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
+import { RequiredFields, SongFields, SubmitButton, UnsavedChangesModal, songRowsDefault } from "./Form";
 import { recommendationsForm, recommendationsRoot } from "../../constants/routes";
 import { useBlocker, useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
@@ -29,7 +29,7 @@ import { useGetGenresQuery } from "../../redux/services/spotifyApi";
  */
 const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
-	const songRowsDefault = 1;
+
 	const [songRows, setSongRows] = useState(songRowsDefault);
 	const [showModal, setShowModal] = useState(false);
 	const navigate = useNavigate();
@@ -72,8 +72,9 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 
 	useEffect(() => {
 		if (data) {
-			methods.reset(data, { keepIsValid: false });
-			setSongRows(data?.suggestions?.length > 0 ? data?.suggestions?.length : songRowsDefault);
+			methods.reset(data, { keepDefaultValues: false, keepDirty: false });
+			const loadedSongRows = data?.suggestions?.length > 0 ? data?.suggestions.map((item) => item.id) : songRowsDefault;
+			setSongRows(loadedSongRows);
 		}
 	}, [methods.reset, data, methods]);
 
@@ -136,26 +137,8 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 							</Grid>
 						</Box>
 					</Paper>
-					<Paper elevation={1}>
-						<Box p={2}>
-							<Typography variant="h5" py={1} gutterBottom>
-								Songs
-							</Typography>
-							<Grid container direction="row" justifyContent={"center"} spacing={2}>
-								<AddSongRowButton setSongRows={setSongRows} songRows={songRows} />
-								<RemoveSongRowButton setSongRows={setSongRows} songRows={songRows} />
-							</Grid>
-							<Grid container direction="row" py={2} px={2}>
-								<Grid item xs={6}>
-									<Typography variant="h6">Title</Typography>
-								</Grid>
-								<Grid item xs={6}>
-									<Typography variant="h6">Artist</Typography>
-								</Grid>
-								<Songs isLoading={isLoading} control={methods.control} songRows={songRows} />
-							</Grid>
-						</Box>
-					</Paper>
+					<SongFields songRows={songRows} setSongRows={setSongRows} isLoading={isLoading} setValue={methods.setValue} />
+					<LastSavedText savedAt={savedAt} key={savedAt} />
 					<Grid container direction="row" mt={0} py={2}>
 						<SubmitButton
 							isCreateMode={false}
@@ -172,6 +155,14 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 				</Box>
 			</FormProvider>
 		</Container>
+	);
+};
+
+const LastSavedText = ({ savedAt }) => {
+	return (
+		<FormHelperText sx={{ textAlign: "left" }} pb={0}>
+			{savedAt ? `Last saved at ${savedAt.toLocaleTimeString()}` : null}
+		</FormHelperText>
 	);
 };
 
