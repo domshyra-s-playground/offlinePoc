@@ -54,7 +54,7 @@ const EditRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay 
 	//!https://reactrouter.com/en/main/hooks/use-blocker#:~:text=Blocking%20a%20user,from%20navigating%20away.
 	let blocker = useBlocker(() => isDirty && !online);
 
-	const { lastSaved: savedAt } = useAutoSave(
+	const { savedAt } = useAutoSave(
 		methods.formState.defaultValues,
 		methods.formState.isDirty,
 		methods.getValues,

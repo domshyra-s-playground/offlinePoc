@@ -27,6 +27,10 @@ export default function useAutoSave(defaultValues, isDirty, getValues, resetFiel
 	const [autoSave, setAutoSave] = useState(null);
 	const [savedAt, setSavedAt] = useState(null);
 
+	const handleSave = useCallback((savedTime) => {
+		setSavedAt(savedTime);
+	}, []);
+
 	// if the form gets dirty start saving every 60 seconds
 	useEffect(() => {
 		if (isDirty) {
@@ -36,14 +40,23 @@ export default function useAutoSave(defaultValues, isDirty, getValues, resetFiel
 			return async () => {
 				//If component is unmounted and isDirty, save the record
 				//Note: this also gets after we trigger the autoSave useEffect below as well as unmount/back button
-				const formIsStillDirty = await autoSaveRecord(defaultValues, getValues, resetField, rtkQueryMutation, id, recordName, setToast);
+				const formIsStillDirty = await autoSaveRecord(
+					defaultValues,
+					getValues,
+					resetField,
+					rtkQueryMutation,
+					id,
+					recordName,
+					setToast,
+					handleSave
+				);
 				if (formIsStillDirty !== true) {
 					setAutoSave(false); // turn autosave off
 					clearInterval(intervalForAutoSave); // clear autosave on dismount
 				}
 			};
 		}
-	}, [defaultValues, getValues, id, isDirty, recordName, resetField, rtkQueryMutation, setToast]);
+	}, [defaultValues, getValues, id, isDirty, recordName, resetField, rtkQueryMutation, setToast, handleSave]);
 
 	useEffect(() => {
 		async function autoSaveData() {
@@ -56,7 +69,7 @@ export default function useAutoSave(defaultValues, isDirty, getValues, resetFiel
 					id,
 					recordName,
 					setToast,
-					setSavedAt
+					handleSave
 				);
 				if (formIsStillDirty !== true) {
 					setAutoSave(false); // turn autosave off
@@ -66,13 +79,13 @@ export default function useAutoSave(defaultValues, isDirty, getValues, resetFiel
 		if (!offline) {
 			autoSaveData();
 		}
-	}, [autoSave, id, defaultValues, getValues, resetField, recordName, rtkQueryMutation, setToast, offline]);
+	}, [autoSave, id, defaultValues, getValues, resetField, recordName, rtkQueryMutation, setToast, offline, handleSave]);
 
 	//On page refresh send data to the back end
 	useBeforeUnload(
 		useCallback(async () => {
-			await autoSaveRecord(defaultValues, getValues, resetField, rtkQueryMutation, id, recordName, setToast, setSavedAt);
-		}, [id, defaultValues, getValues, resetField, recordName, rtkQueryMutation, setToast])
+			await autoSaveRecord(defaultValues, getValues, resetField, rtkQueryMutation, id, recordName, setToast, handleSave);
+		}, [id, defaultValues, getValues, resetField, recordName, rtkQueryMutation, setToast, handleSave])
 	);
 
 	return { savedAt };
@@ -108,6 +121,7 @@ async function autoSaveRecord(defaultValues, getValues, resetField, rtkQueryMuta
 		}
 	});
 }
+//TODO! there is a bug where song rows will get deleted if in progress and we save
 /**
  * Checks the fields that were saved, keep dirty if any changes happened after the save, otherwise reset the field
  * @param {*} valuesToSave
@@ -118,7 +132,7 @@ async function autoSaveRecord(defaultValues, getValues, resetField, rtkQueryMuta
  */
 function resetUpdatedFields(valuesToSave, getValues, resetField, operations) {
 	//if the field is different than when we save, keep that one dirty so we don't loose data, notes for example
-	//TODO! there is a bug where song rows will get deleted if in progress and we save
+
 	const valuesAfterSave = getValues();
 	const inProgressOperations = jsonpatch.compare(valuesToSave, valuesAfterSave);
 	const inProgressFields = inProgressOperations.map((operation) => {

@@ -16,7 +16,6 @@ import { setToast } from "../../redux/slices/toast";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
 import { useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
 
-//TODO: add remove button to each row for song rather than a global remove button
 /**
  * RecommendationForm component.
  *
