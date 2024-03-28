@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Box, Button, Container, Grid, Paper, Typography } from "@mui/material";
+import { Alert, AlertTitle, Box, Button, Container, FormHelperText, Grid, Paper, Stack, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { recommendationsForm, recommendationsRoot } from "../../constants/routes";
 import { useBlocker, useNavigate, useParams } from "react-router-dom";
@@ -26,7 +26,7 @@ import { useGetGenresQuery } from "../../redux/services/spotifyApi";
  * @param {boolean} props.online - Flag indicating if the user is online.
  * @returns {JSX.Element} RecommendationForm component.
  */
-const RecommendationForm = ({ setToast, online }) => {
+const RecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
 	const songRowsDefault = 1;
 	const [songRows, setSongRows] = useState(songRowsDefault);
@@ -42,9 +42,7 @@ const RecommendationForm = ({ setToast, online }) => {
 	} = methods;
 
 	const { id } = params;
-	const isCreateMode = id === undefined;
 
-	const { data, isLoading } = useGetRecommendationQuery(id, { skip: isCreateMode });
 	const { data: genres, isLoading: genresAreLoading } = useGetGenresQuery();
 
 	const [upsertRecommendation] = useUpsertRecommendationMutation();
@@ -57,13 +55,6 @@ const RecommendationForm = ({ setToast, online }) => {
 		setShowModal(blocker.state === "blocked");
 	}, [blocker.state]);
 
-	useEffect(() => {
-		if (data) {
-			methods.reset(data, { keepIsValid: false });
-			setSongRows(data?.suggestions?.length > 0 ? data?.suggestions?.length : songRowsDefault);
-		}
-	}, [methods.reset, data, methods]);
-
 	/**
 	 * Save the record
 	 * @param {*} form
@@ -71,7 +62,7 @@ const RecommendationForm = ({ setToast, online }) => {
 	const onFormSubmit = useCallback(
 		(form) => {
 			setShowLoadingButton(true);
-			upsertRecommendation({ data: form, isCreateMode })
+			upsertRecommendation({ data: form, isCreateMode: true })
 				.then((response) => {
 					console.log(response);
 					if (response.error) {
@@ -80,7 +71,7 @@ const RecommendationForm = ({ setToast, online }) => {
 					}
 					setToast({
 						show: true,
-						message: isCreateMode ? "Recommendation created." : "Recommendation saved.",
+						message: "Recommendation created.",
 						link: `${recommendationsForm}${response.data.id}`,
 					});
 					navigate(recommendationsRoot);
@@ -92,7 +83,7 @@ const RecommendationForm = ({ setToast, online }) => {
 					setShowLoadingButton(false);
 				});
 		},
-		[upsertRecommendation, isCreateMode, setToast, navigate]
+		[upsertRecommendation, setToast, navigate]
 	);
 
 	return (
@@ -100,13 +91,13 @@ const RecommendationForm = ({ setToast, online }) => {
 			{showModal ? <UnsavedChangesModal key={showModal ? "unsaved-changes" : ""} blocker={blocker} setShowModal={setShowModal} /> : null}
 			<FormProvider key="fireStationForm" {...methods}>
 				<Typography variant="h5" gutterBottom>
-					{isCreateMode ? "Create" : "Edit"} Recommendation
+					Create Recommendation
 				</Typography>
 				<Box key="bcegsFormBox" component="form" noValidate autoComplete="off" onSubmit={methods.handleSubmit(onFormSubmit)}>
 					<Paper elevation={2}>
 						<Box p={2} mb={2}>
 							<Grid container direction="row" spacing={2}>
-								<RequiredFields genres={genres} genresAreLoading={genresAreLoading} isLoading={isLoading} control={methods.control} />
+								<RequiredFields genres={genres} genresAreLoading={genresAreLoading} control={methods.control} />
 							</Grid>
 							<Grid container direction="row" spacing={2} py={1}>
 								<Grid item xs={12}>
@@ -115,7 +106,6 @@ const RecommendationForm = ({ setToast, online }) => {
 										label="Description"
 										id="description"
 										customControl={methods.control}
-										isLoading={isLoading}
 										multiline
 										fullWidth
 									/>
@@ -139,16 +129,18 @@ const RecommendationForm = ({ setToast, online }) => {
 								<Grid item xs={6}>
 									<Typography variant="h6">Artist</Typography>
 								</Grid>
-								<Songs isLoading={isLoading} control={methods.control} songRows={songRows} />
+								<Songs control={methods.control} songRows={songRows} />
 							</Grid>
 						</Box>
 					</Paper>
 					<Grid container direction="row" mt={0} py={2}>
 						<SubmitButton
-							isCreateMode={isCreateMode}
+							isCreateMode={true}
 							isDirty={isDirty}
 							isValid={isValid}
 							online={online}
+							offlineAt={offlineAt}
+							offlineAtDisplay={offlineAtDisplay}
 							showLoadingButton={showLoadingButton}
 						/>
 					</Grid>
@@ -236,7 +228,9 @@ const Songs = ({ isLoading, control, songRows }) => {
  *
  * @returns {JSX.Element} The submit button JSX element.
  */
-const SubmitButton = ({ isCreateMode, isDirty, isValid, online, showLoadingButton }) => {
+const SubmitButton = ({ isCreateMode, isDirty, isValid, online, offlineAt, offlineAtDisplay, showLoadingButton }) => {
+	const formIsModified = isDirty || !isValid;
+
 	const btnText = () => {
 		if (!online) {
 			return "Offline";
@@ -250,23 +244,55 @@ const SubmitButton = ({ isCreateMode, isDirty, isValid, online, showLoadingButto
 		if (!online) {
 			return true;
 		}
+		if (!isCreateMode && online && offlineAt && formIsModified) {
+			//show save button only after we have been offline and the form is dirty
+			return true;
+		}
+
 		return !isDirty || !isValid;
 	};
 
+	if (!isCreateMode && !offlineAt) {
+		return null;
+	}
+
 	return (
-		<LoadingButton
-			key="bcegsSubmit"
-			id="submit-form-btn"
-			type="submit"
-			color="primary"
-			variant="contained"
-			loading={showLoadingButton}
-			disabled={btnDisabled()}
-		>
-			{btnText()}
-		</LoadingButton>
+		<>
+			<Stack spacing={2}>
+				<SubmitButtonHelperText online={online} offlineAt={offlineAt} offlineAtDisplay={offlineAtDisplay} formIsModified={formIsModified} />
+			</Stack>
+			<LoadingButton
+				key="bcegsSubmit"
+				id="submit-form-btn"
+				type="submit"
+				color="primary"
+				variant="contained"
+				loading={showLoadingButton}
+				disabled={btnDisabled()}
+			>
+				{btnText()}
+			</LoadingButton>
+		</>
 	);
 };
+
+const SubmitButtonHelperText = ({ online, offlineAt, offlineAtDisplay, formIsModified, lastSaved }) => {
+	return (
+		<>
+			{offlineAt && !online ? (
+				<FormHelperText sx={{ textAlign: "left" }} pb={0}>
+					You have went offline, we cannot auto save.
+				</FormHelperText>
+			) : null}
+			{offlineAt && online && formIsModified && lastSaved > offlineAt ? (
+				<FormHelperText sx={{ textAlign: "left" }} pb={0}>
+					You have went back online, we have haven't saved since {offlineAtDisplay}. Please hit save when ready.
+				</FormHelperText>
+			) : null}
+		</>
+	);
+};
+
 /**
  * The modal component used for displaying a confirmation dialog.
  *
@@ -365,6 +391,8 @@ const RemoveSongRowButton = ({ setSongRows, songRows }) => {
 function mapStateToProps(state) {
 	return {
 		online: state.connectionStatus.online,
+		offlineAt: state.connectionStatus.offlineAt,
+		offlineAtDisplay: state.connectionStatus.offlineAtDisplay,
 	};
 }
 

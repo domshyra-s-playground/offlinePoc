@@ -34,6 +34,17 @@ export const playlistRecommendationApi = createApi({
 				return [{ type: tagType, id: result.id }];
 			},
 		}),
+		patchRecommendation: build.mutation({
+			query({ id, operations }) {
+				return {
+					url: `/${id}`,
+					method: "Patch",
+					headers: { "Content-Type": "application/json-path+json", Accept: "*/*" },
+					body: operations,
+				};
+			},
+			invalidatesTags: (_result, _error, arg) => [{ type: tagType, id: arg.id }],
+		}),
 		deleteRecommendation: build.mutation({
 			query(id) {
 				return {
@@ -47,5 +58,10 @@ export const playlistRecommendationApi = createApi({
 	tagTypes: [tagType],
 });
 
-export const { useGetRecommendationsQuery, useGetRecommendationQuery, useUpsertRecommendationMutation, useDeleteRecommendationMutation } =
-	playlistRecommendationApi;
+export const {
+	useGetRecommendationsQuery,
+	useGetRecommendationQuery,
+	useUpsertRecommendationMutation,
+	useDeleteRecommendationMutation,
+	usePatchRecommendationMutation,
+} = playlistRecommendationApi;
