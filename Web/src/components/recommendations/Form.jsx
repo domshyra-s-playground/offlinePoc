@@ -134,7 +134,7 @@ const RecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) =
 };
 
 const SongFields = ({ control, songRows, setSongRows, setValue, getValues }) => {
-	const removeRow = (guid, index) => {
+	const removeRow = (guid) => {
 		const updatedRows = [...songRows].filter((id) => id !== guid);
 		const newRhfValues = getValues("suggestions").filter((item) => item.id !== guid);
 		setValue(`suggestions`, newRhfValues);
@@ -199,7 +199,7 @@ const Songs = ({ isLoading, control, songRows, removeRow }) => {
 						size="small"
 						startIcon={<RemoveIcon />}
 						onClick={() => {
-							removeRow(guid, index);
+							removeRow(guid);
 						}}
 					>
 						Remove
