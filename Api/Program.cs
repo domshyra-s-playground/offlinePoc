@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 using Database;
 using Microsoft.EntityFrameworkCore.SqlServer;
+using Microsoft.AspNetCore.JsonPatch;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,10 @@ builder.Services.AddDbContext<PlaylistDbContext>(options =>
 
 builder.Services.AddApplicationInsightsTelemetry();
 
+//For json patch
+//?https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch
+builder.Services.AddControllers().AddNewtonsoftJson();
+
 builder.Services.AddScoped<ISpotifyRepo, SpotifyRepo>();
 builder.Services.AddScoped<IPlaylistRepo, PlaylistRepo>();
 builder.Services.AddScoped<IRecommendationRepo, RecommendationRepo>();
@@ -53,10 +58,12 @@ var app = builder.Build();
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 
+app.MapControllers();
+
+
 //Routes
 UseSpotifyPlaylistRoutes(app);
 UseRatingsRoutes(app);
-UseRecommendationsRoutes(app);
 
 
 //TODO remove
@@ -68,6 +75,10 @@ app.MapFallbackToFile("index.html");
 
 app.Run();
 
+/// <summary>
+/// Spotify routes
+/// </summary>
+/// <param name="app"></param>
 static void UseSpotifyPlaylistRoutes(WebApplication app)
 {
     app.MapGet("/spotify", async (ISpotifyRepo _spotifyProvider) =>
@@ -88,6 +99,10 @@ static void UseSpotifyPlaylistRoutes(WebApplication app)
     }).WithName("GetSpotifyGenres").WithTags("Spotify");
 }
 
+/// <summary>
+/// Ratings routes
+/// </summary>
+/// <param name="app"></param>
 static void UseRatingsRoutes(WebApplication app)
 {
     app.MapGet("/ratings", (IPlaylistRepo repo) => repo.GetRatings()).Produces<PlaylistRatingDto[]>(StatusCodes.Status200OK).WithTags("Ratings");
@@ -120,38 +135,4 @@ static void UseRatingsRoutes(WebApplication app)
         await repo.DeleteRating(id);
         return Results.Ok();
     }).Produces(StatusCodes.Status200OK).WithTags("Ratings");
-}
-
-static void UseRecommendationsRoutes(WebApplication app)
-{
-    app.MapGet("/recommendations", (IRecommendationRepo repo) => repo.GetRecommendations()).Produces<PlaylistRecommendationDto[]>(StatusCodes.Status200OK).WithTags("Recommendations");
-    app.MapGet("/recommendations/{id}", async (string id, IRecommendationRepo repo) =>
-    {
-        var record = await repo.GetRecommendation(id);
-        if (record == null)
-            return Results.NoContent();
-        return Results.Ok(record);
-    }).Produces<PlaylistRecommendationDto>(StatusCodes.Status200OK).Produces(StatusCodes.Status204NoContent).WithTags("Recommendations");
-
-    app.MapPost("/recommendations", async ([FromBody] PlaylistRecommendationDto recommendation, IRecommendationRepo repo) =>
-    {
-        var newRecord = await repo.AddRecommendation(recommendation);
-        return Results.Created($"/recommendations/{newRecord.Id}", newRecord);
-    }).Produces<PlaylistRecommendationDto>(StatusCodes.Status201Created).WithTags("Recommendations");
-
-    app.MapPut("/recommendations", async ([FromBody] PlaylistRecommendationDto recommendation, IRecommendationRepo repo) =>
-    {
-        var existingRecord = await repo.GetRecommendation(recommendation.Id.ToString());
-        if (existingRecord == null)
-            return Results.NoContent();
-        var updatedRecord = await repo.UpdateRecommendation(recommendation);
-        return Results.Ok(updatedRecord);
-    }).Produces<PlaylistRecommendationDto>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status204NoContent).WithTags("Recommendations");
-
-    app.MapDelete("/recommendations/{id}", async (string id, IRecommendationRepo repo) =>
-    {
-        await repo.DeleteRecommendation(id);
-        return Results.Ok();
-    }).Produces(StatusCodes.Status200OK).WithTags("Recommendations");
 }
