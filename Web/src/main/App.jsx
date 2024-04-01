@@ -1,9 +1,9 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
+import CreateRecommendationForm from "../components/recommendations/CreateForm";
 import EditRecommendationForm from "../components/recommendations/EditForm";
 import Layout from "./Layout";
 import PlaylistDetails from "../components/playlists/PlaylistDetails";
-import RecommendationForm from "../components/recommendations/Form";
 import ViewPlaylists from "../components/playlists/ViewPlaylists";
 import ViewRecommendations from "../components/recommendations/View";
 import { recommendationsRoot } from "../constants/routes";
@@ -23,7 +23,7 @@ const router = createBrowserRouter([
 				path: `${recommendationsRoot}/`,
 				children: [
 					{ index: true, Component: ViewRecommendations },
-					{ path: "create", Component: RecommendationForm },
+					{ path: "create", Component: CreateRecommendationForm },
 					{ path: "form/:id", Component: EditRecommendationForm },
 				],
 			},

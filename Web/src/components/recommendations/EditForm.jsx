@@ -1,6 +1,6 @@
 import { Box, Container, FormHelperText, Grid, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import { RequiredFields, SongFields, UnsavedChangesModal } from "./Form";
+import { RequiredFields, SongFields, UnsavedChangesModal } from "./CreateForm";
 import { useBlocker, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useGetRecommendationQuery, usePatchRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
@@ -11,6 +11,7 @@ import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
 import useAutoSave from "../../useAutoSave";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
+import { useTheme } from "@mui/material/styles";
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -22,7 +23,7 @@ import { v4 as uuidv4 } from "uuid";
  * @param {boolean} props.online - Flag indicating if the user is online.
  * @returns {JSX.Element} RecommendationForm component.
  */
-const EditRecommendationForm = ({ setToast, online }) => {
+const EditRecommendationForm = ({ setToast, online, offlineAtDisplay }) => {
 	const [songRows, setSongRows] = useState([uuidv4()]);
 	const [showModal, setShowModal] = useState(false);
 	const [recommendationLoaded, setRecommendationLoaded] = useState(false);
@@ -108,7 +109,7 @@ const EditRecommendationForm = ({ setToast, online }) => {
 						setValue={methods.setValue}
 						getValues={methods.getValues}
 					/>
-					<LastSavedText savedAt={savedAt} key={savedAt} />
+					<LastSavedText savedAt={savedAt} key={savedAt} offline={!online} offlineAtDisplay={offlineAtDisplay} />
 					<DevTool control={methods.control} />
 				</Box>
 			</FormProvider>
@@ -116,11 +117,20 @@ const EditRecommendationForm = ({ setToast, online }) => {
 	);
 };
 
-const LastSavedText = ({ savedAt }) => {
+const LastSavedText = ({ savedAt, offline, offlineAtDisplay }) => {
+	const theme = useTheme();
+	const errorStyle = theme.palette.error.main;
 	return (
-		<FormHelperText sx={{ textAlign: "left" }} pb={0}>
-			{savedAt ? `Last saved at ${savedAt.toLocaleTimeString()}` : null}
-		</FormHelperText>
+		<>
+			{offline ? (
+				<FormHelperText sx={{ textAlign: "left", color: errorStyle }} pb={0}>
+					{`Offline since ${offlineAtDisplay}, changes will be saved when you're back online.`}
+				</FormHelperText>
+			) : null}
+			<FormHelperText sx={{ textAlign: "left" }} pb={0}>
+				{savedAt ? `Last saved at ${savedAt.toLocaleTimeString()}` : null}
+			</FormHelperText>
+		</>
 	);
 };
 

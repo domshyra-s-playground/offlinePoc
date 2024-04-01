@@ -26,7 +26,7 @@ import { v4 as uuidv4 } from "uuid";
  * @param {boolean} props.online - Flag indicating if the user is online.
  * @returns {JSX.Element} RecommendationForm component.
  */
-const RecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) => {
+const CreateRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
 	const [songRows, setSongRows] = useState([uuidv4()]);
 	const [showModal, setShowModal] = useState(false);
@@ -408,5 +408,5 @@ const mapDispatchToProps = {
 	setToast,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(RecommendationForm);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateRecommendationForm);
 export { RequiredFields, Songs, SubmitButton, UnsavedChangesModal, AddSongRowButton, SongFields };
