@@ -1,4 +1,4 @@
-import { Box, Container, FormHelperText, Grid, Paper, Typography } from "@mui/material";
+import { Box, Container, FormHelperText, Grid, Paper, Tooltip, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { RequiredFields, SongFields, UnsavedChangesModal } from "./CreateForm";
 import { useBlocker, useParams } from "react-router-dom";
@@ -8,6 +8,8 @@ import { useGetRecommendationQuery, usePatchRecommendationMutation } from "../..
 import { DevTool } from "@hookform/devtools";
 import GenericTextItem from "../subcomponets/GenericTextItem";
 import { connect } from "react-redux";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { setToast } from "../../redux/slices/toast";
 import useAutoSave from "../../useAutoSave";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
@@ -118,6 +120,7 @@ const EditRecommendationForm = ({ setToast, online, offlineAtDisplay }) => {
 };
 
 const LastSavedText = ({ savedAt, offline, offlineAtDisplay }) => {
+	dayjs.extend(relativeTime);
 	const theme = useTheme();
 	const errorStyle = theme.palette.error.main;
 	return (
@@ -127,8 +130,8 @@ const LastSavedText = ({ savedAt, offline, offlineAtDisplay }) => {
 					{`Offline since ${offlineAtDisplay}, changes will be saved when you're back online.`}
 				</FormHelperText>
 			) : null}
-			<FormHelperText sx={{ textAlign: "left" }} pb={0}>
-				{savedAt ? `Last saved at ${savedAt.toLocaleTimeString()}` : null}
+			<FormHelperText sx={{ textAlign: "left" }} pb={0} title={``}>
+				{savedAt ? <Tooltip title={`${savedAt.toLocaleTimeString()}`}>Last saved at {dayjs(savedAt).fromNow()}</Tooltip> : null}
 			</FormHelperText>
 		</>
 	);

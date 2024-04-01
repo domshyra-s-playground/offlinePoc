@@ -9,11 +9,11 @@ import StyledAppBar from "../components/StyledAppBar";
 import { ToastLayout } from "./ToastLayout";
 import { connect } from "react-redux";
 
-function Layout({ status: { online, onlineAt, offlineAt } }) {
+function Layout({ status: { online, onlineAt, offlineAt, offlineAtDisplay } }) {
 	return (
 		<>
 			<StyledAppBar />
-			<OfflineAlert show={!online} at={online ? onlineAt : offlineAt} />
+			<OfflineAlert show={!online} at={online ? onlineAt : offlineAt} displayAt={offlineAtDisplay} />
 			<Box sx={{ mb: 2 }}>
 				<div className="App">
 					<Grid mt={2}>
