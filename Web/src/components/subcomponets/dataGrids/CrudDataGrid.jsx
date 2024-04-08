@@ -4,8 +4,8 @@ import React, { useCallback, useRef, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteModal from "../modals/DeleteModal";
+import { NavLink } from "react-router-dom";
 import PropTypes from "prop-types";
-import { Link as RouterLink } from "react-router-dom";
 import StripedDataGrid from "./StripedDataGrid";
 import { connect } from "react-redux";
 import { setToast } from "../../../redux/slices/toast";
@@ -161,7 +161,7 @@ const Header = ({ createLabel, createPath, singleton, title }) => {
 					{title}
 				</Typography>
 				<Grid item sx={{ flexGrow: 1 }} />
-				<Link id={`create-link-${singleton}`} component={RouterLink} to={{ pathname: `${createPath}` }}>
+				<Link id={`create-link-${singleton}`} component={NavLink} to={{ pathname: `${createPath}` }}>
 					<Grid id={`create-grid-item-${singleton}`} item ml={2}>
 						<Button
 							color="primary"

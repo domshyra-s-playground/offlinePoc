@@ -11,7 +11,8 @@ export const OfflineAlert = ({ show, at, displayAt }) => {
 			<Collapse in={show}>
 				<Alert severity="error" variant="filled">
 					<AlertTitle>Offline</AlertTitle>
-					The app has been offline since <Tooltip title={displayAt}>{dayjs(at).fromNow()}</Tooltip>. Please check your internet connection.
+					The app has been offline since <Tooltip title={displayAt}>{dayjs(new Date(JSON.parse(at))).fromNow()}</Tooltip>. Please check your
+					internet connection.
 				</Alert>
 			</Collapse>
 		</Box>
