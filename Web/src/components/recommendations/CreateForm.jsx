@@ -163,6 +163,26 @@ const SongFields = ({ control, songRows, setSongRows, setValue, getValues }) => 
 		</Paper>
 	);
 };
+
+const SongFieldsEmpty = () => {
+	return (
+		<Paper elevation={1}>
+			<Box p={2}>
+				<Typography variant="h5" py={1} gutterBottom>
+					Songs
+				</Typography>
+				<Grid container direction="row" py={2} px={2}>
+					<Grid item xs={6}>
+						<Typography variant="h6">Title</Typography>
+					</Grid>
+					<Grid item xs={6}>
+						<Typography variant="h6">Artist</Typography>
+					</Grid>
+				</Grid>
+			</Box>
+		</Paper>
+	);
+};
 /**
  * Represents a list of songs.
  * @type {React.ReactNode}
@@ -409,4 +429,4 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateRecommendationForm);
-export { RequiredFields, Songs, SubmitButton, UnsavedChangesModal, AddSongRowButton, SongFields };
+export { RequiredFields, Songs, SubmitButton, UnsavedChangesModal, AddSongRowButton, SongFields, SongFieldsEmpty };

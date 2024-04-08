@@ -1,9 +1,13 @@
 import { Box, Container, FormHelperText, Grid, Paper, Tooltip, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import { RequiredFields, SongFields, UnsavedChangesModal } from "./CreateForm";
+import { RequiredFields, SongFields, SongFieldsEmpty, UnsavedChangesModal } from "./CreateForm";
 import { useBlocker, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useGetRecommendationQuery, usePatchRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
+import {
+	useGetRecommendationQuery,
+	useGetRecommendationsQuery,
+	usePatchRecommendationMutation,
+} from "../../redux/services/playlistRecommendationApi";
 
 import { DevTool } from "@hookform/devtools";
 import GenericTextItem from "../subcomponets/GenericTextItem";
@@ -40,10 +44,17 @@ const EditRecommendationForm = ({ setToast, online, offlineAtDisplay }) => {
 
 	const { id } = params;
 
-	const { data: recommendation, isLoading } = useGetRecommendationQuery(id);
+	const { data: recommendation, isLoading, refetch } = useGetRecommendationQuery(id);
 	const { data: genres, isLoading: genresAreLoading } = useGetGenresQuery();
-
 	const [patchRecommendation] = usePatchRecommendationMutation();
+
+	//This is for offline loading, skip if online
+	const { data: recommendationOffline, isLoading: offlineIsLoading } = useGetRecommendationsQuery(undefined, {
+		selectFromResult: ({ data, isLoading }) => ({
+			data: data?.filter((recommendation) => recommendation.id === id)[0] || null,
+			isLoading,
+		}),
+	});
 
 	//https://reactrouter.com/en/main/hooks/use-blocker
 	//!https://reactrouter.com/en/main/hooks/use-blocker#:~:text=Blocking%20a%20user,from%20navigating%20away.
@@ -61,6 +72,8 @@ const EditRecommendationForm = ({ setToast, online, offlineAtDisplay }) => {
 		!online
 	);
 
+	const loadFromOfflineDataStore = !online && !recommendationLoaded && !recommendation && !offlineIsLoading;
+
 	useEffect(() => {
 		setShowModal(blocker.state === "blocked");
 	}, [blocker.state]);
@@ -73,8 +86,15 @@ const EditRecommendationForm = ({ setToast, online, offlineAtDisplay }) => {
 			setSongRows(loadedSongRows);
 			//This is to prevent the form from resetting data when we patch the record
 			setRecommendationLoaded(true);
+		} else if (loadFromOfflineDataStore && recommendationOffline) {
+			methods.reset(recommendationOffline, { keepDefaultValues: false, keepDirty: false });
 		}
-	}, [methods.reset, recommendation, methods, recommendationLoaded]);
+
+		if (online && recommendationLoaded && !recommendation && !recommendationLoaded) {
+			//if we loaded offline lets try and refetch
+			refetch();
+		}
+	}, [methods.reset, recommendation, methods, recommendationLoaded, online, recommendationOffline, loadFromOfflineDataStore, refetch]);
 
 	return (
 		<Container>
@@ -104,13 +124,18 @@ const EditRecommendationForm = ({ setToast, online, offlineAtDisplay }) => {
 							</Grid>
 						</Box>
 					</Paper>
-					<SongFields
-						songRows={songRows}
-						setSongRows={setSongRows}
-						isLoading={isLoading}
-						setValue={methods.setValue}
-						getValues={methods.getValues}
-					/>
+					{loadFromOfflineDataStore ? <Typography variant="h7">Offline, couldn't load songs at this time</Typography> : null}
+					{loadFromOfflineDataStore ? (
+						<SongFieldsEmpty />
+					) : (
+						<SongFields
+							songRows={songRows}
+							setSongRows={setSongRows}
+							isLoading={isLoading}
+							setValue={methods.setValue}
+							getValues={methods.getValues}
+						/>
+					)}
 					<LastSavedText savedAt={savedAt} key={savedAt} offline={!online} offlineAtDisplay={offlineAtDisplay} />
 					<DevTool control={methods.control} />
 				</Box>
