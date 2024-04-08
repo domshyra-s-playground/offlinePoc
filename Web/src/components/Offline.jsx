@@ -16,7 +16,11 @@ const Offline = ({ children, setOnline, setOffline, status }) => {
 	}, [setOffline, setOnline]);
 
 	useEffect(() => {
-		console.log(`Online: ${online} Offline at: ${offlineAt} Online at: ${onlineAt}`);
+		console.log(
+			`Online: ${online} Offline at: ${new Date(JSON.parse(offlineAt)).toLocaleString()} Online at: ${new Date(
+				JSON.parse(onlineAt)
+			).toLocaleString()}`
+		);
 	}, [online, offlineAt, onlineAt]);
 
 	return <>{children}</>;
