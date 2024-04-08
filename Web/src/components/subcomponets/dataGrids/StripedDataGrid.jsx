@@ -3,7 +3,7 @@ import { Link, Typography } from "@mui/material";
 import React, { forwardRef, useCallback } from "react";
 import { alpha, styled } from "@mui/material/styles";
 
-import { Link as RouterLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 /**
  * Striped Data Grid component
@@ -50,7 +50,7 @@ const StripedDataGrid = forwardRef((props, ref) => {
 				type: columnToHyperlink.type,
 				renderCell: (cellValues) => {
 					return (
-						<Link component={RouterLink} to={`${getHyperlinkUrl(hyperlinkUrl)}${cellValues.row.id}`} underline="none">
+						<Link component={NavLink} to={`${getHyperlinkUrl(hyperlinkUrl)}${cellValues.row.id}`} underline="none">
 							<Typography id={`${singleton}-${cellValues.row.id}`} color="primary" display="inline" sx={{ fontWeight: "bold" }}>
 								{cellValues.row[hyperlinkColumnFieldName]}
 							</Typography>

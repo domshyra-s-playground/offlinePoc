@@ -6,8 +6,8 @@ import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MusicVideoIcon from "@mui/icons-material/MusicVideo";
+import { NavLink } from "react-router-dom";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
-import { Link as RouterLink } from "react-router-dom";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { recommendationsLabel } from "../constants/labels";
@@ -40,7 +40,7 @@ const StyledAppBar = () => {
 
 	const hamburgerMenus = (items) => {
 		return items.map((item) => (
-			<Link underline="none" component={RouterLink} to={item.path} key={item.path}>
+			<Link underline="none" component={NavLink} to={item.path} key={item.path}>
 				<MenuItem onClick={handleClose} aria-label={`Show ${item.label}`} title={`Show ${item.label}`}>
 					<Grid container direction="row" alignContent="center" alignItems="center">
 						<IconButton color="primary">{item.icon}</IconButton>
@@ -78,12 +78,12 @@ const StyledAppBar = () => {
 						{hamburgerMenus(menuItems)}
 					</Menu>
 
-					<Link underline="none" to="/" component={RouterLink} color="white">
+					<Link underline="none" to="/" component={NavLink} color="white">
 						<Typography variant="h6" noWrap component="div" sx={{ display: { xs: "none", sm: "block" } }}>
 							Playlists
 						</Typography>
 					</Link>
-					<Link underline="none" to={`${recommendationsRoot}/`} component={RouterLink} color="white" px={2}>
+					<Link underline="none" to={`${recommendationsRoot}/`} component={NavLink} color="white" px={2}>
 						<Typography variant="h6" noWrap component="div" sx={{ display: { xs: "none", sm: "block" } }}>
 							Recommendations
 						</Typography>
