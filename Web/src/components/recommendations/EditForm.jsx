@@ -120,6 +120,7 @@ const EditRecommendationForm = ({ setToast, online, offlineAtDisplay }) => {
 };
 
 const LastSavedText = ({ savedAt, offline, offlineAtDisplay }) => {
+	const [showRelativeTime, setShowRelativeTime] = useState(false);
 	dayjs.extend(relativeTime);
 	const theme = useTheme();
 	const errorStyle = theme.palette.error.main;
@@ -130,8 +131,18 @@ const LastSavedText = ({ savedAt, offline, offlineAtDisplay }) => {
 					{`Offline since ${offlineAtDisplay}, changes will be saved when you're back online.`}
 				</FormHelperText>
 			) : null}
-			<FormHelperText sx={{ textAlign: "left" }} pb={0} title={``}>
-				{savedAt ? <Tooltip title={`${savedAt.toLocaleTimeString()}`}>Last saved at {dayjs(savedAt).fromNow()}</Tooltip> : null}
+			<FormHelperText
+				sx={{ textAlign: "left" }}
+				pb={0}
+				onClick={() => {
+					setShowRelativeTime(!showRelativeTime);
+				}}
+			>
+				{savedAt ? (
+					<Tooltip title={showRelativeTime ? `${savedAt.toLocaleTimeString()}` : `${dayjs(savedAt).fromNow()}`}>
+						Last saved at {showRelativeTime ? dayjs(savedAt).fromNow() : savedAt.toLocaleTimeString()}
+					</Tooltip>
+				) : null}
 			</FormHelperText>
 		</>
 	);
