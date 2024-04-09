@@ -120,7 +120,7 @@ const EditRecommendationForm = ({ setToast, online, offlineAtDisplay }) => {
 };
 
 const LastSavedText = ({ savedAt, offline, offlineAtDisplay }) => {
-	const [showRelativeTime, setShowRelativeTime] = useState(false);
+	const [showRelativeTime, setShowRelativeTime] = useState(true);
 	dayjs.extend(relativeTime);
 	const theme = useTheme();
 	const errorStyle = theme.palette.error.main;
