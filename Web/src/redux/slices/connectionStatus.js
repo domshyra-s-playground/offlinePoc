@@ -1,8 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-//TODO installHook.js:1 A non-serializable value was detected in the state, in the path: `connectionStatus.onlineAt`. Value: Sun Mar 31 2024 21:06:15 GMT-0700 (Pacific Daylight Time) 
-// Take a look at the reducer(s) handling this action type: spotifyApi/subscriptions/internal_probeSubscription.
-// (See https://redux.js.org/faq/organizing-state#can-i-put-functions-promises-or-other-non-serializable-items-in-my-store-state)
+// Slice for connection status
 const connectionStatus = createSlice({
 	name: "connectionStatus",
 	initialState: {
