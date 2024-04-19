@@ -19,12 +19,8 @@ export const spotifyApi = createApi({
 			query: (playlistId) => `/${playlistId}`,
 			providesTags: (_result, _err, playlistId) => [{ type: tagType, playlistId }],
 		}),
-		getGenres: build.query({
-			query: () => `/genres`,
-			providesTags: () => ["genres"],
-		}),
 	}),
 	tagTypes: [tagType],
 });
 
-export const { useGetPlaylistsQuery, useGetPlaylistQuery, useGetGenresQuery } = spotifyApi;
+export const { useGetPlaylistsQuery, useGetPlaylistQuery } = spotifyApi;

@@ -4,21 +4,26 @@ import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 
 import App from "./main/App";
 import Offline from "./components/Offline";
+import { PersistGate } from "redux-persist/integration/react";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider as ReduxProvider } from "react-redux";
+import persistStore from "redux-persist/es/persistStore";
 import reportWebVitals from "./main/reportWebVitals";
 import setupStore from "./redux/store";
 
 const store = setupStore();
+let persistor = persistStore(store);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
 	<React.StrictMode>
 		<ReduxProvider store={store}>
-			<Offline>
-				<App />
-			</Offline>
+			<PersistGate loading={null} persistor={persistor}>
+				<Offline>
+					<App />
+				</Offline>
+			</PersistGate>
 		</ReduxProvider>
 	</React.StrictMode>
 );

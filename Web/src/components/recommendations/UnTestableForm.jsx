@@ -14,7 +14,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import SelectItem from "../subcomponets/SelectItem";
 import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
-import { useGetGenresQuery } from "../../redux/services/spotifyApi";
+import { useGetGenresQuery } from "../../redux/services/offlineDependenciesApi";
 
 //Here is an example of a component that is difficult to test because it has a lot of dependencies and side effects that are not easily mocked because they are encapsulated in the component.
 const RecommendationForm = ({ setToast, online }) => {

@@ -4,7 +4,7 @@ import { useDeleteRecommendationMutation, useGetRecommendationsQuery } from "../
 import CrudDataGrid from "../subcomponets/dataGrids/CrudDataGrid";
 import React from "react";
 import { recommendationsLabel } from "../../constants/labels";
-import { useGetGenresQuery } from "../../redux/services/spotifyApi";
+import { useGetGenresQuery } from "../../redux/services/offlineDependenciesApi";
 
 const ViewRecommendations = () => {
 	const { data, isLoading } = useGetRecommendationsQuery();

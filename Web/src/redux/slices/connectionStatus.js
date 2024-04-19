@@ -1,3 +1,4 @@
+import { PURGE } from "redux-persist";
 import { createSlice } from "@reduxjs/toolkit";
 
 // Slice for connection status
@@ -28,6 +29,12 @@ const connectionStatus = createSlice({
 				offlineAtDisplay: new Date().toLocaleString(),
 			};
 		},
+	},
+	extraReducers: (builder) => {
+		builder.addCase(PURGE, (state) => {
+			//TODO: implement customEntityAdapter
+			// customEntityAdapter.removeAll(state);
+		});
 	},
 });
 
