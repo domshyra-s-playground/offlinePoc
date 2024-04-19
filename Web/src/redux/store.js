@@ -2,6 +2,7 @@ import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE, persistReducer } fro
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
 import connectionStatus from "./slices/connectionStatus";
+import inProgressForm from "./slices/inProgressForm";
 import { offlineDependenciesApi } from "./services/offlineDependenciesApi";
 import { playlistRatingApi } from "./services/playlistRatingApi";
 import { playlistRecommendationApi } from "./services/playlistRecommendationApi";
@@ -17,8 +18,8 @@ import toast from "./slices/toast";
 const persistConfig = {
 	key: "root",
 	storage,
-	whitelist: [offlineDependenciesApi.reducerPath],
-	blacklist: [spotifyApi.reducerPath, playlistRatingApi.reducerPath, playlistRecommendationApi.reducerPath, connectionStatus, toast],
+	whitelist: [offlineDependenciesApi.reducerPath, "inProgressForm"],
+	blacklist: [spotifyApi.reducerPath, playlistRatingApi.reducerPath, playlistRecommendationApi.reducerPath, "connectionStatus", "toast"],
 };
 // Create the root reducer separately so we can extract the RootState type
 const rootReducer = combineReducers({
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
 	[offlineDependenciesApi.reducerPath]: offlineDependenciesApi.reducer,
 	toast,
 	connectionStatus,
+	inProgressForm,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

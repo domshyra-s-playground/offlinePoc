@@ -4,6 +4,7 @@ import Config from "../../config";
 import { REHYDRATE } from "redux-persist";
 
 const fetchUrl = `${Config.baseApiUrl}spotify`;
+const unusedDataConst = 60 * 60 * 4000; //4 hours
 
 function isHydrateAction(action) {
 	return action.type === REHYDRATE;
@@ -18,20 +19,20 @@ export const offlineDependenciesApi = createApi({
 	// to prevent circular type issues, the return type needs to be annotated as any
 	extractRehydrationInfo(action, { reducerPath }) {
 		if (isHydrateAction(action)) {
-			console.log(reducerPath);
 			// when persisting the api reducer
 			if (action.key === "root") {
-				return action.payload?.[reducerPath];
+				return action.payload;
 			}
 
 			// When persisting the root reducer
-			return action.payload[offlineDependenciesApi.reducerPath];
+			return action.payload[reducerPath];
 		}
 	},
 	endpoints: (build) => ({
 		getGenres: build.query({
 			query: () => `/genres`,
 			providesTags: () => ["genres"],
+			keepUnusedDataFor: unusedDataConst,
 		}),
 	}),
 	tagTypes: ["genres"],
