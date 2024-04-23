@@ -17,17 +17,17 @@ export const offlineDependenciesApi = createApi({
 	baseQuery: fetchBaseQuery({ baseUrl: fetchUrl }),
 	reducerPath: "offlineDependenciesApi",
 	// to prevent circular type issues, the return type needs to be annotated as any
-	extractRehydrationInfo(action, { reducerPath }) {
-		if (isHydrateAction(action)) {
-			// when persisting the api reducer
-			if (action.key === "root") {
-				return action.payload;
-			}
+	// extractRehydrationInfo(action, { reducerPath }) {
+	// 	if (isHydrateAction(action)) {
+	// 		// when persisting the api reducer
+	// 		if (action.key === "root") {
+	// 			return action.payload;
+	// 		}
 
-			// When persisting the root reducer
-			return action.payload[reducerPath];
-		}
-	},
+	// 		// When persisting the root reducer
+	// 		return action.payload[reducerPath];
+	// 	}
+	// },
 	endpoints: (build) => ({
 		getGenres: build.query({
 			query: () => `/genres`,

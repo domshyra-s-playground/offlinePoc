@@ -18,8 +18,15 @@ import toast from "./slices/toast";
 const persistConfig = {
 	key: "root",
 	storage,
-	whitelist: [offlineDependenciesApi.reducerPath, "inProgressForm"],
-	blacklist: [spotifyApi.reducerPath, playlistRatingApi.reducerPath, playlistRecommendationApi.reducerPath, "connectionStatus", "toast"],
+	whitelist: ["inProgressForm"],
+	blacklist: [
+		spotifyApi.reducerPath,
+		playlistRatingApi.reducerPath,
+		playlistRecommendationApi.reducerPath,
+		offlineDependenciesApi.reducerPath,
+		"connectionStatus",
+		"toast",
+	],
 };
 // Create the root reducer separately so we can extract the RootState type
 const rootReducer = combineReducers({
