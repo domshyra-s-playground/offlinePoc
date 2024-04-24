@@ -1,4 +1,5 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { useGetGenresQuery, useGetPlaylistsQuery } from "../redux/services/spotifyApi";
 
 import CreateRecommendationForm from "../components/recommendations/CreateForm";
 import EditRecommendationForm from "../components/recommendations/EditForm";
@@ -32,5 +33,9 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
+	//api data required for offline, this is so the service worker can cache the data on the first load / install
+	useGetGenresQuery();
+	useGetPlaylistsQuery();
+
 	return <RouterProvider router={router} />;
 }

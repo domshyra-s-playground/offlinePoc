@@ -128,11 +128,11 @@ self.addEventListener("message", (event) => {
 self.addEventListener("install", (event) => {
 	console.log("Service worker installed");
 	//TODO! not sure what to do below here
-	event.waitUntil(
-		caches.open(offlineCacheName).then((cache) => {
-			cache.addAll(offlineApiRoutes);
-		})
-	);
+	// event.waitUntil(
+	// 	caches.open(offlineCacheName).then((cache) => {
+	// 		cache.addAll(offlineApiRoutes);
+	// 	})
+	// );
 	// event.waitUntil(
 	// 	caches.open("images").then((cache) => {
 	// 		cache.addAll(offlineApiRoutes);
@@ -147,6 +147,7 @@ self.addEventListener("fetch", async (event) => {
 	console.log("Service worker fetch");
 	console.log(`URL requested: ${event.request.url}`);
 	const route = event.request.url.replace(Config.baseApiUrl, "");
+	console.log(`Route requested: ${route}`);
 	let key = "images";
 	if (offlineApiRoutes.includes(route)) {
 		key = offlineCacheName;

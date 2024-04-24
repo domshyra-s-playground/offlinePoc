@@ -1,4 +1,4 @@
-import { IconButton, Rating, Skeleton } from "@mui/material";
+import { IconButton, Rating, Skeleton, Tooltip } from "@mui/material";
 import { useAddRatingMutation, useDeleteRatingMutation, useUpdateRatingMutation } from "../../redux/services/playlistRatingApi";
 
 import { Box } from "@mui/system";
@@ -6,7 +6,6 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import HeartBrokenIcon from "@mui/icons-material/HeartBroken";
 import { PropTypes } from "prop-types";
-import { isProdEnv } from "../../config";
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
 
@@ -92,7 +91,11 @@ HeartRatings.propType = {
 function renderHeart(ratingIsLoading, title, playlistRating, playlistId, error) {
 	return () => {
 		if (error) {
-			return <div>Failed to load ratings</div>;
+			return (
+				<Tooltip title="Error loading rating" placement="right" arrow>
+					<HeartBrokenIcon color="error" />
+				</Tooltip>
+			);
 		}
 		if (!ratingIsLoading) {
 			return <HeartRatings title={title} rating={playlistRating?.rating ?? 0} playlistId={playlistId} ratingId={playlistRating?.id} />;
