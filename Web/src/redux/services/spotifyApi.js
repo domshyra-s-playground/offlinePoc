@@ -5,6 +5,7 @@ import Config from "../../config";
 const fetchUrl = `${Config.baseApiUrl}spotify`;
 
 const tagType = "Playlist";
+const immutableDataTimeout = 60 * 60 * 4000; //4 hours
 
 //?https://redux-toolkit.js.org/rtk-query/usage/queries
 export const spotifyApi = createApi({
@@ -19,8 +20,13 @@ export const spotifyApi = createApi({
 			query: (playlistId) => `/${playlistId}`,
 			providesTags: (_result, _err, playlistId) => [{ type: tagType, playlistId }],
 		}),
+		getGenres: build.query({
+			query: () => `/genres`,
+			providesTags: () => ["genres"],
+			keepUnusedDataFor: immutableDataTimeout,
+		}),
 	}),
 	tagTypes: [tagType],
 });
 
-export const { useGetPlaylistsQuery, useGetPlaylistQuery } = spotifyApi;
+export const { useGetPlaylistsQuery, useGetPlaylistQuery, useGetGenresQuery } = spotifyApi;

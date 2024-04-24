@@ -3,7 +3,6 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
 import connectionStatus from "./slices/connectionStatus";
 import inProgressForm from "./slices/inProgressForm";
-import { offlineDependenciesApi } from "./services/offlineDependenciesApi";
 import { playlistRatingApi } from "./services/playlistRatingApi";
 import { playlistRecommendationApi } from "./services/playlistRecommendationApi";
 import { spotifyApi } from "./services/spotifyApi";
@@ -19,21 +18,13 @@ const persistConfig = {
 	key: "root",
 	storage,
 	whitelist: ["inProgressForm"],
-	blacklist: [
-		spotifyApi.reducerPath,
-		playlistRatingApi.reducerPath,
-		playlistRecommendationApi.reducerPath,
-		offlineDependenciesApi.reducerPath,
-		"connectionStatus",
-		"toast",
-	],
+	blacklist: [spotifyApi.reducerPath, playlistRatingApi.reducerPath, playlistRecommendationApi.reducerPath, "connectionStatus", "toast"],
 };
 // Create the root reducer separately so we can extract the RootState type
 const rootReducer = combineReducers({
 	[spotifyApi.reducerPath]: spotifyApi.reducer,
 	[playlistRatingApi.reducerPath]: playlistRatingApi.reducer,
 	[playlistRecommendationApi.reducerPath]: playlistRecommendationApi.reducer,
-	[offlineDependenciesApi.reducerPath]: offlineDependenciesApi.reducer,
 	toast,
 	connectionStatus,
 	inProgressForm,
@@ -50,7 +41,7 @@ const setupStore = (preloadedState) => {
 				serializableCheck: {
 					ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
 				},
-			}).concat(spotifyApi.middleware, playlistRatingApi.middleware, playlistRecommendationApi.middleware, offlineDependenciesApi.middleware),
+			}).concat(spotifyApi.middleware, playlistRatingApi.middleware, playlistRecommendationApi.middleware),
 		preloadedState,
 	});
 };

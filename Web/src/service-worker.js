@@ -16,10 +16,10 @@ import { StaleWhileRevalidate } from "workbox-strategies";
 import { clientsClaim } from "workbox-core";
 import { registerRoute } from "workbox-routing";
 
-const offlineCacheName = "api-cache";
+const offlineCacheName = "api-offline-cache";
 
 // these are the routes we are going to cache for offline support
-const offlineApiRoutes = ["spotify/genres"];
+const offlineApiRoutes = ["spotify/genres", "spotify"];
 
 clientsClaim();
 
@@ -69,7 +69,7 @@ registerRoute(
 	})
 );
 
-//manefest.json and icon
+//manefest.json
 registerRoute(
 	({ url }) => url.origin === self.location.origin && url.pathname === "/manifest.json",
 	new StaleWhileRevalidate({
@@ -81,10 +81,21 @@ registerRoute(
 		],
 	})
 );
+//Icons
+registerRoute(
+	// Add in any other file extensions or routing criteria as needed.
+	({ url }) => url.origin === self.location.origin && url.pathname.endsWith(".ico"),
+	new StaleWhileRevalidate({
+		cacheName: "icons",
+		plugins: [
+			new CacheableResponsePlugin({
+				statuses: [200],
+			}),
+		],
+	})
+);
 
 const apiRouteCb = ({ url }) => {
-	console.log(`URL requested: ${url}`);
-	console.log(`Pathname requested: ${url.pathname}`);
 	return offlineApiRoutes.includes(url.pathname);
 };
 
@@ -117,11 +128,11 @@ self.addEventListener("message", (event) => {
 self.addEventListener("install", (event) => {
 	console.log("Service worker installed");
 	//TODO! not sure what to do below here
-	// event.waitUntil(
-	// 	caches.open(cacheName).then((cache) => {
-	// 		cache.addAll(offlineApiRoutes);
-	// 	})
-	// );
+	event.waitUntil(
+		caches.open(offlineCacheName).then((cache) => {
+			cache.addAll(offlineApiRoutes);
+		})
+	);
 	// event.waitUntil(
 	// 	caches.open("images").then((cache) => {
 	// 		cache.addAll(offlineApiRoutes);
@@ -132,28 +143,29 @@ self.addEventListener("activate", (event) => {
 	console.log("Service worker activated");
 });
 
-self.addEventListener("fetch", (event) => {
+self.addEventListener("fetch", async (event) => {
 	console.log("Service worker fetch");
-	console.log(event);
 	console.log(`URL requested: ${event.request.url}`);
 	const route = event.request.url.replace(Config.baseApiUrl, "");
-	console.log(`Route requested: ${route}`);
+	let key = "images";
 	if (offlineApiRoutes.includes(route)) {
-		console.log(`Route ${route} is part of the offline cache`);
-		openAndSetCacheViaKey(offlineCacheName);
+		key = offlineCacheName;
 	} else if (event.request.url.includes("/manifest.json")) {
-		openAndSetCacheViaKey("manifest");
-	} else if (event.request.url.endsWith(".ico")) {
-		openAndSetCacheViaKey("ico");
+		key = "manifest";
+	} else if (event.request.url.includes(".ico")) {
+		key = "icons";
+	}
+	//this is for the spotify imgs
+	else if (event.request.url.includes(".png") || event.request.url.startsWith("https://image-cdn-ak")) {
+		key = "images";
+	} else {
+		console.log(`No cache key found for ${event.request.url}`);
+		return;
 	}
 
-	/**
-	 * Open the cache and set the cache based on the key
-	 * @param {string} key
-	 */
-	function openAndSetCacheViaKey(key) {
-		console.log(`${key} cache requested`);
+	event.respondWith(
 		caches.open(key).then(async (cache) => {
+			console.log(`Cache opened for ${event.request.url} with cache key ${key}`);
 			const response = await cache.match(event.request);
 			if (response) {
 				console.log(`Cache hit for ${event.request.url}`);
@@ -164,6 +176,6 @@ self.addEventListener("fetch", (event) => {
 			cache.put(event.request, response_1.clone());
 			console.log(`Response added to the cache for ${event.request.url}`);
 			return response_1;
-		});
-	}
+		})
+	);
 });

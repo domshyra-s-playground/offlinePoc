@@ -14,7 +14,7 @@ import { playlistRoot } from "../../constants/routes";
 import { renderHeart } from "./HeartRatings";
 import { useNavigate } from "react-router-dom";
 
-const PlaylistCard = ({ title, imageURL, description, genre, trackAndFollowerText, ratingIsLoading, playlistRating, playlistId }) => {
+const PlaylistCard = ({ title, imageURL, description, genre, trackAndFollowerText, ratingIsLoading, playlistRating, playlistId, ratingError }) => {
 	const sectionWidth = 215;
 	const cardWidth = sectionWidth * 2;
 
@@ -40,6 +40,7 @@ const PlaylistCard = ({ title, imageURL, description, genre, trackAndFollowerTex
 						description={description}
 						playlistRating={playlistRating}
 						playlistId={playlistId}
+						error={ratingError}
 					/>
 				</CardContent>
 				{/* desktop */}
@@ -60,8 +61,8 @@ const PlaylistCard = ({ title, imageURL, description, genre, trackAndFollowerTex
 	);
 };
 
-const DescriptionCardContent = ({ title, description, ratingIsLoading, playlistRating, playlistId }) => {
-	const heart = renderHeart(ratingIsLoading, title, playlistRating, playlistId);
+const DescriptionCardContent = ({ title, description, ratingIsLoading, playlistRating, playlistId, error }) => {
+	const heart = renderHeart(ratingIsLoading, title, playlistRating, playlistId, error);
 
 	return (
 		<>
@@ -92,13 +93,20 @@ const DesktopCardContent = ({ title, playlistId }) => {
 	);
 };
 
-const MobileCardContent = ({ title, genre, ratingIsLoading, trackAndFollowerText, description, playlistRating, playlistId }) => {
+const MobileCardContent = ({ title, genre, ratingIsLoading, trackAndFollowerText, description, playlistRating, playlistId, error }) => {
 	return (
 		<>
 			<Typography sx={{ display: { xs: "block", md: "none" } }} component="div" variant="h6" color="text.secondary.light">
 				{title}
 			</Typography>
-			<DescriptionCardContent title={title} description={description} playlistId={playlistId} playlistRating={ratingIsLoading} />
+			<DescriptionCardContent
+				title={title}
+				description={description}
+				playlistId={playlistId}
+				playlistRating={playlistRating}
+				ratingIsLoading={ratingIsLoading}
+				error={error}
+			/>
 			<Typography sx={{ display: { xs: "block", md: "none" } }} component="div" variant="caption" color="text.secondary" align="center">
 				{genre}
 			</Typography>

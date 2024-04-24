@@ -19,11 +19,12 @@ const initTime = getNewDateForRedux();
 const connectionStatus = createSlice({
 	name: "connectionStatus",
 	initialState: {
-		online: false,
-		onlineAt: null,
-		previousOnline: null,
-		offlineAt: initTime.at,
-		offlineAtDisplay: initTime.display,
+		online: navigator.onLine,
+		onlineAt: navigator.onLine ? initTime.at : null,
+		onlineAtDisplay: navigator.onLine ? initTime.display : null,
+		previousOnlineAt: null,
+		offlineAt: navigator.onLine ? null : initTime.at,
+		offlineAtDisplay: navigator.onLine ? null : initTime.display,
 	},
 	reducers: {
 		setOnline: (state, _) => {
@@ -31,7 +32,7 @@ const connectionStatus = createSlice({
 			return {
 				...state,
 				online: true,
-				previousOnline: state.online,
+				previousOnlineAt: state.onlineAt,
 				onlineAt: now.at,
 				onlineAtDisplay: now.display,
 			};
@@ -41,7 +42,7 @@ const connectionStatus = createSlice({
 			return {
 				...state,
 				online: false,
-				previousOnline: state.online,
+				previousOnlineAt: state.onlineAt,
 				offlineAt: now.at,
 				offlineAtDisplay: now.display,
 			};

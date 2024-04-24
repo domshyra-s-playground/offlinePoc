@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { setToast } from "../../redux/slices/toast";
 import useAutoSave from "../../useAutoSave";
-import { useGetGenresQuery } from "../../redux/services/offlineDependenciesApi";
+import { useGetGenresQuery } from "../../redux/services/spotifyApi";
 import { useTheme } from "@mui/material/styles";
 import { v4 as uuidv4 } from "uuid";
 

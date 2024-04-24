@@ -14,7 +14,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import SelectItem from "../subcomponets/SelectItem";
 import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
-import { useGetGenresQuery } from "../../redux/services/offlineDependenciesApi";
+import { useGetGenresQuery } from "../../redux/services/spotifyApi";
 import useInProgressForm from "../../useInProgressForm";
 import { useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
 import { v4 as uuidv4 } from "uuid";

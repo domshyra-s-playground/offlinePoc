@@ -89,12 +89,11 @@ HeartRatings.propType = {
 	playlistId: PropTypes.string.isRequired,
 };
 
-function renderHeart(ratingIsLoading, title, playlistRating, playlistId) {
+function renderHeart(ratingIsLoading, title, playlistRating, playlistId, error) {
 	return () => {
-		if (isProdEnv()) {
-			return null;
+		if (error) {
+			return <div>Failed to load ratings</div>;
 		}
-
 		if (!ratingIsLoading) {
 			return <HeartRatings title={title} rating={playlistRating?.rating ?? 0} playlistId={playlistId} ratingId={playlistRating?.id} />;
 		}

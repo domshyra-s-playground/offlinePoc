@@ -1,5 +1,6 @@
 const Config = {
-	baseApiUrl: isProdEnv() ? "https://offlinepocapi.azurewebsites.net/" : "https://localhost:7167/",
+	// baseApiUrl: isProdEnv() ? "https://offlinepocapi.azurewebsites.net/" : "https://localhost:7167/",
+	baseApiUrl: "https://localhost:7167/",
 };
 
 const currencyFormatter = Intl.NumberFormat("en-US", {
