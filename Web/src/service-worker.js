@@ -69,18 +69,19 @@ registerRoute(
 	})
 );
 
-//manefest.json
-registerRoute(
-	({ url }) => url.origin === self.location.origin && url.pathname === "/manifest.json",
-	new StaleWhileRevalidate({
-		cacheName: "manifest",
-		plugins: [
-			new CacheableResponsePlugin({
-				statuses: [200],
-			}),
-		],
-	})
-);
+//TODO! dunno if this is needed
+// //manefest.json
+// registerRoute(
+// 	({ url }) => url.origin === self.location.origin && url.pathname === "/manifest.json",
+// 	new StaleWhileRevalidate({
+// 		cacheName: "manifest",
+// 		plugins: [
+// 			new CacheableResponsePlugin({
+// 				statuses: [200],
+// 			}),
+// 		],
+// 	})
+// );
 //Icons
 registerRoute(
 	// Add in any other file extensions or routing criteria as needed.
@@ -151,9 +152,12 @@ self.addEventListener("fetch", async (event) => {
 	let key = "images";
 	if (offlineApiRoutes.includes(route)) {
 		key = offlineCacheName;
-	} else if (event.request.url.includes("/manifest.json")) {
-		key = "manifest";
-	} else if (event.request.url.includes(".ico")) {
+	}
+	//TODO! I am not sure if this is needed, once deployed it just 404 since its under wwwroot?? but all those other workbox prechace works? maybe its just not needed
+	// else if (event.request.url.includes("/manifest.json")) {
+	// 	key = "manifest";
+	// } 
+	else if (event.request.url.includes(".ico")) {
 		key = "icons";
 	}
 	//this is for the spotify imgs
