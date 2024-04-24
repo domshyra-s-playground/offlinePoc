@@ -13,18 +13,17 @@ const getNewDateForRedux = () => {
 		display: now.toLocaleString(),
 	};
 };
-const initTime = getNewDateForRedux();
 
 // Slice for connection status
 const connectionStatus = createSlice({
 	name: "connectionStatus",
 	initialState: {
-		online: navigator.onLine,
-		onlineAt: navigator.onLine ? initTime.at : null,
-		onlineAtDisplay: navigator.onLine ? initTime.display : null,
+		online: null,
+		onlineAt: null,
+		onlineAtDisplay: null,
 		previousOnlineAt: null,
-		offlineAt: navigator.onLine ? null : initTime.at,
-		offlineAtDisplay: navigator.onLine ? null : initTime.display,
+		offlineAt: null,
+		offlineAtDisplay: null,
 	},
 	reducers: {
 		setOnline: (state, _) => {
