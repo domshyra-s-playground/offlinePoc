@@ -4,17 +4,23 @@
 
 Grabs spotify playlists based on appsettings `Spotify:Username` value.
 Has a form and index page to interact with.
-If you don't have a spotfiy dev account go [here](https://developer.spotify.com/documentation/web-api/tutorials/getting-started)
+If you don't have a Spotify dev account go [here](https://developer.spotify.com/documentation/web-api/tutorials/getting-started)
 
-Written in .Net and react
+Written with a .net core backend and a react frontend. 
 
-deployed to [https://offlinepocweb.azurewebsites.net](https://offlinepocweb.azurewebsites.net)
+deployed to [offlinepocweb.azurewebsites.net](https://offlinepocweb.azurewebsites.net)
+
+This code base shows the transformation of a basic react app with RTKQuery to one with a PWA and offline capabilities. This will alert the user if they are offline and will not allow them to save changes to the form. This will also cache the genres and playlists from spotify so that the user can still interact with the app offline. Note ratings are never cached as an example of how to handle more volatile data that isn't avail offline.
+
+
+#### Other versions
 
 There are a few examples of how this project has progressed or the other technologies that have improved over time
 
 [Here is a sample version in containers](https://github.com/domshyra-s-playground/containersDemo)
 
 [Here is a the upgrade to rtkQuery](https://github.com/domshyra-s-playground/rtkQueryDemo)
+
 
 
 ## Screen shots 
@@ -31,15 +37,15 @@ The edit page should use patches to save changes to the server. If offline it wi
 ![image](https://github.com/domshyra-s-playground/baseRtkQueryApp/assets/1061957/bc9014bf-870c-4000-b7e8-c75d85126c21)
 
 #### Offline 
-if the app goes offline then the user will get an alert banner. This will disable saving on the form, and if the user has unsaved changes and tries to leave the form they will get a modal alert. The RTKQuery data should be loaded from the cache and the user can still enter a recommendation while offline. 
-
+if the app goes offline then the user will get an alert banner. This will disable saving on the form, and if the user has unsaved changes and tries to leave the form they will get a modal alert. This can also be installed as a PWA and will work offline. This caches the genres as well as the playlists from spotify, but will not cache the ratings. [Here is the code](https://github.com/domshyra-s-playground/offlinePoc/pull/4) to make this work offline and add PWA/service worker functionality. Learn more about [PWA's here](https://web.dev/learn/pwa/welcome)
+ 
 <img width="538" alt="image" src="https://github.com/domshyra-s-playground/offlinePoc/assets/1061957/e886ba9a-7ed7-4f56-a5f0-3886c73601ab"> <img width="304" alt="image" src="https://github.com/domshyra-s-playground/offlinePoc/assets/1061957/282b3a22-105a-40c7-a075-85c87a1e4c92">
 
 
-
+Here is an example of the cache in the browser. This is the cache for the genres and playlists from spotify as well as any offline assets and data we need to store.
 
 ## Getting Started
-I recommend using VS Code and opening the API folder and the Web folder each in seprate vs code instances. 
+I recommend using VS Code and opening the API folder and the Web folder each in septate vs code instances. 
 
 
 ### API
@@ -85,4 +91,8 @@ run `npm install`
 
 run `npm start`
 
-in vscode use "Launch Chrome against localhost" to view the website or naviagate to the url webpack outputs in the npm start command 
+in vscode use "Launch Chrome against localhost" to view the website or navigate to the url webpack outputs in the npm start command 
+
+
+#### Service worker testing
+In order to test the service worker you will need to build the project and run it in production mode. CRA has a built in service worker that will only work in production mode. use `npm run build` to build the project and then `serve -s build` to run the project in production mode locally. More about the service worker debugging and testing [here](https://web.dev/learn/pwa/tools-and-debug)
