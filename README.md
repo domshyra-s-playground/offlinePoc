@@ -12,6 +12,14 @@ This code base shows the transformation of a basic react app with RTKQuery to on
 
 deployed to [offlinepocweb.azurewebsites.net](https://offlinepocweb.azurewebsites.net)
 
+### Next steps
+This is NOT READY FOR PRODUCTION. This is a proof of concept and should be treated as such. 
+
+- Installing the PWA still needs some work. 
+  - The service worker is not being installed correctly. Data is cached once fetched, but if the PWA is closed and reopened the data is not fetched from the cache. 
+- Updates to the deployed PWA are not working at the moment. Thus it needs to be uninstalled and reinstalled to get the latest version.
+- PWA has no refresh button, this isn't bad but it would be nice to have and to design this as an App first
+
 ### Other versions of this project
 
 There are a few examples of how this project has progressed or the other technologies that have improved over time
