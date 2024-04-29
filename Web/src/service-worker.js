@@ -101,7 +101,10 @@ self.addEventListener("message", (event) => {
 // This code executes in its own worker or thread
 self.addEventListener("install", (event) => {
 	console.log("Service worker installed");
-	//TODO! not sure what to do below here
+	//TODO! not sure what to do below here yet
+	// here is a gist with examples https://gist.github.com/JMPerez/8ca8d5ffcc0cc45a8b4e1c279efd8a94
+	// here is the web docs for pwa install https://web.dev/install-criteria/
+	// also here https://web.dev/learn/pwa/installation
 	// event.waitUntil(
 	// 	caches.open(offlineCacheName).then((cache) => {
 	// 		cache.addAll(offlineApiRoutes);
@@ -109,7 +112,7 @@ self.addEventListener("install", (event) => {
 	// );
 	// event.waitUntil(
 	// 	caches.open("images").then((cache) => {
-	// 		cache.addAll(offlineApiRoutes);
+	// 		cache.addAll(img/paths??);
 	// 	})
 	// );
 });

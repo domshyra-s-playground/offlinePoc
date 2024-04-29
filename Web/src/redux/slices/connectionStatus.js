@@ -1,8 +1,7 @@
-import { PURGE } from "redux-persist";
 import { createSlice } from "@reduxjs/toolkit";
 
 /**
- * 
+ *
  * @returns {Object} - Object containing the current date and time in JSON and display format
  */
 const getNewDateForRedux = () => {
@@ -47,15 +46,7 @@ const connectionStatus = createSlice({
 			};
 		},
 	},
-	extraReducers: (builder) => {
-		builder.addCase(PURGE, (state) => {
-			//TODO: implement customEntityAdapter
-			// customEntityAdapter.removeAll(state);
-		});
-	},
 });
-
-
 
 export const { setOnline, setOffline } = connectionStatus.actions;
 
