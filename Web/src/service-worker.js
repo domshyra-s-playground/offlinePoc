@@ -7,11 +7,19 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
-import { clientsClaim } from 'workbox-core';
-import { ExpirationPlugin } from 'workbox-expiration';
-import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
-import { registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate } from 'workbox-strategies';
+import { createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching";
+
+import { CacheableResponsePlugin } from "workbox-cacheable-response";
+import Config from "./config";
+import { ExpirationPlugin } from "workbox-expiration";
+import { StaleWhileRevalidate } from "workbox-strategies";
+import { clientsClaim } from "workbox-core";
+import { registerRoute } from "workbox-routing";
+
+const offlineCacheName = "api-offline-cache";
+
+// these are the routes we are going to cache for offline support
+const offlineApiRoutes = ["spotify/genres", "spotify"];
 
 clientsClaim();
 
@@ -24,49 +32,124 @@ precacheAndRoute(self.__WB_MANIFEST);
 // Set up App Shell-style routing, so that all navigation requests
 // are fulfilled with your index.html shell. Learn more at
 // https://developers.google.com/web/fundamentals/architecture/app-shell
-const fileExtensionRegexp = new RegExp('/[^/?]+\\.[^/]+$');
+const fileExtensionRegexp = new RegExp("/[^/?]+\\.[^/]+$");
 registerRoute(
-  // Return false to exempt requests from being fulfilled by index.html.
-  ({ request, url }) => {
-    // If this isn't a navigation, skip.
-    if (request.mode !== 'navigate') {
-      return false;
-    } // If this is a URL that starts with /_, skip.
+	// Return false to exempt requests from being fulfilled by index.html.
+	({ request, url }) => {
+		// If this isn't a navigation, skip.
+		if (request.mode !== "navigate") {
+			return false;
+		} // If this is a URL that starts with /_, skip.
 
-    if (url.pathname.startsWith('/_')) {
-      return false;
-    } // If this looks like a URL for a resource, because it contains // a file extension, skip.
+		if (url.pathname.startsWith("/_")) {
+			return false;
+		} // If this looks like a URL for a resource, because it contains // a file extension, skip.
 
-    if (url.pathname.match(fileExtensionRegexp)) {
-      return false;
-    } // Return true to signal that we want to use the handler.
+		if (url.pathname.match(fileExtensionRegexp)) {
+			return false;
+		} // Return true to signal that we want to use the handler.
 
-    return true;
-  },
-  createHandlerBoundToURL(process.env.PUBLIC_URL + '/index.html')
+		return true;
+	},
+	createHandlerBoundToURL(process.env.PUBLIC_URL + "/index.html")
 );
 
 // An example runtime caching route for requests that aren't handled by the
 // precache, in this case same-origin .png requests like those from in public/
 registerRoute(
-  // Add in any other file extensions or routing criteria as needed.
-  ({ url }) => url.origin === self.location.origin && url.pathname.endsWith('.png'), // Customize this strategy as needed, e.g., by changing to CacheFirst.
-  new StaleWhileRevalidate({
-    cacheName: 'images',
-    plugins: [
-      // Ensure that once this runtime cache reaches a maximum size the
-      // least-recently used images are removed.
-      new ExpirationPlugin({ maxEntries: 50 }),
-    ],
-  })
+	// Add in any other file extensions or routing criteria as needed.
+	({ url }) => url.origin === self.location.origin && (url.pathname.endsWith(".png") || url.pathname.endsWith(".ico")), // Customize this strategy as needed, e.g., by changing to CacheFirst.
+	new StaleWhileRevalidate({
+		cacheName: "images",
+		plugins: [
+			// Ensure that once this runtime cache reaches a maximum size the
+			// least-recently used images are removed.
+			new ExpirationPlugin({ maxEntries: 50 }),
+		],
+	})
+);
+
+const apiRouteCb = ({ url }) => {
+	return offlineApiRoutes.includes(url.pathname);
+};
+
+//This should register the route for the API calls and their cache strategy
+registerRoute(
+	apiRouteCb,
+	new StaleWhileRevalidate({
+		cacheName: offlineCacheName,
+		plugins: [
+			new CacheableResponsePlugin({
+				statuses: [200, 404],
+				headers: {
+					"X-Is-Cacheable": "true",
+				},
+			}),
+		],
+	})
 );
 
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+self.addEventListener("message", (event) => {
+	if (event.data && event.data.type === "SKIP_WAITING") {
+		self.skipWaiting();
+	}
 });
 
 // Any other custom service worker logic can go here.
+// This code executes in its own worker or thread
+self.addEventListener("install", (event) => {
+	console.log("Service worker installed");
+	//TODO! not sure what to do below here yet
+	// here is a gist with examples https://gist.github.com/JMPerez/8ca8d5ffcc0cc45a8b4e1c279efd8a94
+	// here is the web docs for pwa install https://web.dev/install-criteria/
+	// also here https://web.dev/learn/pwa/installation
+	// event.waitUntil(
+	// 	caches.open(offlineCacheName).then((cache) => {
+	// 		cache.addAll(offlineApiRoutes);
+	// 	})
+	// );
+	// event.waitUntil(
+	// 	caches.open("images").then((cache) => {
+	// 		cache.addAll(img/paths??);
+	// 	})
+	// );
+});
+self.addEventListener("activate", (event) => {
+	console.log("Service worker activated");
+});
+
+self.addEventListener("fetch", async (event) => {
+	console.log("Service worker fetch");
+	console.log(`URL requested: ${event.request.url}`);
+	const route = event.request.url.replace(Config.baseApiUrl, "");
+	console.log(`Route requested: ${route}`);
+	let key = "images";
+	if (offlineApiRoutes.includes(route)) {
+		key = offlineCacheName;
+	}
+	//this is for the spotify imgs, fav icons, and other images
+	else if (event.request.url.includes(".png") || event.request.url.startsWith("https://image-cdn-ak") || event.request.url.includes(".ico")) {
+		key = "images";
+	} else {
+		console.log(`No cache key found for ${event.request.url}`);
+		return;
+	}
+
+	event.respondWith(
+		caches.open(key).then(async (cache) => {
+			console.log(`Cache opened for ${event.request.url} with cache key ${key}`);
+			const response = await cache.match(event.request);
+			if (response) {
+				console.log(`Cache hit for ${event.request.url}`);
+				return response;
+			}
+			console.log(`Cache miss for ${event.request.url}`);
+			const response_1 = await fetch(event.request);
+			cache.put(event.request, response_1.clone());
+			console.log(`Response added to the cache for ${event.request.url}`);
+			return response_1;
+		})
+	);
+});

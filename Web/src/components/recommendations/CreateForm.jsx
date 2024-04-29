@@ -1,5 +1,6 @@
 import { Alert, AlertTitle, Box, Button, Container, FormHelperText, Grid, Paper, Stack, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
+import { clearInProgressForm, setInProgressForm } from "../../redux/slices/inProgressForm";
 import { recommendationsForm, recommendationsRoot } from "../../constants/routes";
 import { useBlocker, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -14,8 +15,13 @@ import SelectItem from "../subcomponets/SelectItem";
 import { connect } from "react-redux";
 import { setToast } from "../../redux/slices/toast";
 import { useGetGenresQuery } from "../../redux/services/spotifyApi";
+import useInProgressForm from "../../useInProgressForm";
 import { useUpsertRecommendationMutation } from "../../redux/services/playlistRecommendationApi";
 import { v4 as uuidv4 } from "uuid";
+
+const defaultFormValues = {
+	suggestions: [{ id: uuidv4(), title: "", artist: "" }],
+};
 
 /**
  * RecommendationForm component.
@@ -26,13 +32,25 @@ import { v4 as uuidv4 } from "uuid";
  * @param {boolean} props.online - Flag indicating if the user is online.
  * @returns {JSX.Element} RecommendationForm component.
  */
-const CreateRecommendationForm = ({ setToast, online, offlineAt, offlineAtDisplay }) => {
+const CreateRecommendationForm = ({
+	setToast,
+	online,
+	offlineAt,
+	offlineAtDisplay,
+	setInProgressForm,
+	clearInProgressForm,
+	inProgressFormData,
+	shouldLoadFromPersisted,
+}) => {
 	const [showLoadingButton, setShowLoadingButton] = useState(false);
 	const [songRows, setSongRows] = useState([uuidv4()]);
 	const [showModal, setShowModal] = useState(false);
 	const navigate = useNavigate();
 	const methods = useForm({
-		mode: "onChange",
+		mode: "onBlur",
+		//?When defaultValue is not defined, the first render of watch will return undefined because it is called before register.
+		//?It's recommended to provide defaultValues at useForm to avoid this behaviour, but you can set the inline defaultValue as the second argument.
+		defaultValues: shouldLoadFromPersisted ? inProgressFormData : defaultFormValues,
 	});
 	const {
 		formState: { isDirty, isValid },
@@ -41,6 +59,7 @@ const CreateRecommendationForm = ({ setToast, online, offlineAt, offlineAtDispla
 	const { data: genres, isLoading: genresAreLoading } = useGetGenresQuery();
 
 	const [upsertRecommendation] = useUpsertRecommendationMutation();
+	useInProgressForm(methods, "recommendation", { set: setInProgressForm, clear: clearInProgressForm });
 
 	//https://reactrouter.com/en/main/hooks/use-blocker
 	//!https://reactrouter.com/en/main/hooks/use-blocker#:~:text=Blocking%20a%20user,from%20navigating%20away.
@@ -401,11 +420,15 @@ function mapStateToProps(state) {
 		online: state.connectionStatus.online,
 		offlineAt: state.connectionStatus.offlineAt,
 		offlineAtDisplay: state.connectionStatus.offlineAtDisplay,
+		shouldLoadFromPersisted: state.inProgressForm.inProgress && state.inProgressForm.formType === "recommendation",
+		inProgressFormData: state.inProgressForm.form,
 	};
 }
 
 const mapDispatchToProps = {
 	setToast,
+	setInProgressForm,
+	clearInProgressForm,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateRecommendationForm);

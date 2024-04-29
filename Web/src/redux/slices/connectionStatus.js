@@ -1,31 +1,48 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+/**
+ *
+ * @returns {Object} - Object containing the current date and time in JSON and display format
+ */
+const getNewDateForRedux = () => {
+	const now = new Date();
+
+	return {
+		at: JSON.stringify(now),
+		display: now.toLocaleString(),
+	};
+};
+
 // Slice for connection status
 const connectionStatus = createSlice({
 	name: "connectionStatus",
 	initialState: {
-		online: true,
-		onlineAt: JSON.stringify(new Date()),
-		previousOnline: null,
+		online: null,
+		onlineAt: null,
+		onlineAtDisplay: null,
+		previousOnlineAt: null,
 		offlineAt: null,
+		offlineAtDisplay: null,
 	},
 	reducers: {
 		setOnline: (state, _) => {
+			const now = getNewDateForRedux();
 			return {
 				...state,
 				online: true,
-				previousOnline: state.online,
-				onlineAt: JSON.stringify(new Date()),
-				onlineAtDisplay: new Date().toLocaleString(),
+				previousOnlineAt: state.onlineAt,
+				onlineAt: now.at,
+				onlineAtDisplay: now.display,
 			};
 		},
 		setOffline: (state, _) => {
+			const now = getNewDateForRedux();
 			return {
 				...state,
 				online: false,
-				previousOnline: state.online,
-				offlineAt: JSON.stringify(new Date()),
-				offlineAtDisplay: new Date().toLocaleString(),
+				previousOnlineAt: state.onlineAt,
+				offlineAt: now.at,
+				offlineAtDisplay: now.display,
 			};
 		},
 	},
