@@ -126,7 +126,7 @@ self.addEventListener("fetch", async (event) => {
 	if (offlineApiRoutes.includes(route)) {
 		key = offlineCacheName;
 	}
-	//this is for the spotify imgs
+	//this is for the spotify imgs, fav icons, and other images
 	else if (event.request.url.includes(".png") || event.request.url.startsWith("https://image-cdn-ak") || event.request.url.includes(".ico")) {
 		key = "images";
 	} else {
