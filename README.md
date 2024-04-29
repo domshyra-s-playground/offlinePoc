@@ -44,6 +44,10 @@ if the app goes offline then the user will get an alert banner. This will disabl
 
 Here is an example of the cache in the browser. This is the cache for the genres and playlists from spotify as well as any offline assets and data we need to store.
 
+![image](https://github.com/domshyra-s-playground/offlinePoc/assets/1061957/bca4b4b5-7f2b-4cab-a13d-371eb994a99e)
+
+
+
 ## Getting Started
 I recommend using VS Code and opening the API folder and the Web folder each in septate vs code instances. 
 
