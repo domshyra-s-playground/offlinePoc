@@ -13,7 +13,7 @@ const PlaylistDetails = () => {
 	//Here we are using the useQuery hook from the generated api because we don't know if we've loaded the playlist yet from the index page
 	const { data: playlists, isLoading: playlistsIsLoading } = spotifyApi.endpoints.getPlaylists.useQuery();
 
-	const { data: rating, isLoading: ratingIsLoading } = useGetRatingQuery(playlistId);
+	const { data: rating, isLoading: ratingIsLoading, error: ratingError } = useGetRatingQuery(playlistId);
 	const { data: playlistDetails, isLoading: playlistDetailsIsLoading } = useGetPlaylistQuery(playlistId);
 
 	const [playlist, setPlaylist] = useState(null);
@@ -29,6 +29,8 @@ const PlaylistDetails = () => {
 		return () => {};
 	}, [playlists, playlistsIsLoading, playlistDetails, playlistDetailsIsLoading, playlistId]);
 
-	return <PlaylistCardDetails {...playlist} ratingIsLoading={ratingIsLoading} playlistRating={rating} playlistId={playlistId} />;
+	return (
+		<PlaylistCardDetails {...playlist} ratingIsLoading={ratingIsLoading} playlistRating={rating} playlistId={playlistId} error={ratingError} />
+	);
 };
 export default PlaylistDetails;

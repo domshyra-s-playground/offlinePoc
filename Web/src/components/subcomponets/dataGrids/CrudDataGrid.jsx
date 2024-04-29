@@ -5,6 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteModal from "../modals/DeleteModal";
 import { NavLink } from "react-router-dom";
+import OfflineDataHelper from "../OfflineDataHelper";
 import PropTypes from "prop-types";
 import StripedDataGrid from "./StripedDataGrid";
 import { connect } from "react-redux";
@@ -82,6 +83,7 @@ const CrudDataGrid = (props) => {
 					show={showDeleteModal}
 					handleClose={handleCloseDeleteModal}
 				/>
+				<OfflineDataHelper />
 			</Box>
 		</Container>
 	);

@@ -8,12 +8,17 @@ import { Outlet } from "react-router-dom";
 import StyledAppBar from "../components/StyledAppBar";
 import { ToastLayout } from "./ToastLayout";
 import { connect } from "react-redux";
+import { useMemo } from "react";
 
 function Layout({ status: { online, onlineAt, offlineAt, offlineAtDisplay } }) {
+	const offlineBannerAlert = useMemo(() => {
+		return <OfflineAlert show={!online} at={online ? onlineAt : offlineAt} displayAt={offlineAtDisplay} />;
+	}, [online, onlineAt, offlineAt, offlineAtDisplay]);
+
 	return (
 		<>
 			<StyledAppBar />
-			<OfflineAlert show={!online} at={online ? onlineAt : offlineAt} displayAt={offlineAtDisplay} />
+			{offlineBannerAlert}
 			<Box sx={{ mb: 2 }}>
 				<div className="App">
 					<Grid mt={2}>

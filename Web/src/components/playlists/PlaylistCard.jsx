@@ -6,12 +6,12 @@ import AspectRatio from "@mui/joy/AspectRatio";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
+import Heart from "./Heart";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import OpenInSpotifyText from "../subcomponets/OpenInfSpotify";
 import { PropTypes } from "prop-types";
 import Typography from "@mui/material/Typography";
 import { playlistRoot } from "../../constants/routes";
-import { renderHeart } from "./HeartRatings";
 import { useNavigate } from "react-router-dom";
 
 const PlaylistCard = ({ title, imageURL, description, genre, trackAndFollowerText, ratingIsLoading, playlistRating, playlistId, ratingError }) => {
@@ -62,14 +62,12 @@ const PlaylistCard = ({ title, imageURL, description, genre, trackAndFollowerTex
 };
 
 const DescriptionCardContent = ({ title, description, ratingIsLoading, playlistRating, playlistId, error }) => {
-	const heart = renderHeart(ratingIsLoading, title, playlistRating, playlistId, error);
-
 	return (
 		<>
 			<Typography variant="subtitle2" color="text.secondary" component="div" gutterBottom>
 				{description}
 			</Typography>
-			{heart()}
+			<Heart ratingIsLoading={ratingIsLoading} title={title} playlistRating={playlistRating} playlistId={playlistId} error={error} />
 			{OpenInSpotifyText(playlistId)}
 		</>
 	);

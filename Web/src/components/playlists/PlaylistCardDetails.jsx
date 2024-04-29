@@ -7,21 +7,31 @@ import AspectRatio from "@mui/joy/AspectRatio";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
+import Heart from "./Heart";
+import OfflineDataHelper from "../subcomponets/OfflineDataHelper";
 import OpenInSpotifyText from "../subcomponets/OpenInfSpotify";
 import { PropTypes } from "prop-types";
 import Typography from "@mui/material/Typography";
-import { renderHeart } from "./HeartRatings";
 import { useNavigate } from "react-router-dom";
 
-const PlaylistCardDetails = ({ title, imageURL, description, genre, trackCount, followerCount, ratingIsLoading, playlistRating, playlistId }) => {
+const PlaylistCardDetails = ({
+	title,
+	imageURL,
+	description,
+	genre,
+	trackCount,
+	followerCount,
+	ratingIsLoading,
+	playlistRating,
+	playlistId,
+	error,
+}) => {
 	const sectionWidth = 350;
 	const cardWidth = sectionWidth * 2;
 	const nav = useNavigate();
 
-	const heart = renderHeart(ratingIsLoading, title, playlistRating, playlistId);
-
 	return (
-		<>
+		<Grid container justifyContent="center">
 			<Button onClick={() => nav(`/`)} variant="text" startIcon={<ArrowBackIosIcon />}>
 				Back to playlists
 			</Button>
@@ -44,7 +54,7 @@ const PlaylistCardDetails = ({ title, imageURL, description, genre, trackCount, 
 						<Typography variant="subtitle2" color="text.secondary" component="div" gutterBottom>
 							{description}
 						</Typography>
-						{heart()}
+						<Heart ratingIsLoading={ratingIsLoading} playlistRating={playlistRating} playlistId={playlistId} error={error} />
 						{OpenInSpotifyText(playlistId)}
 						<Typography variant="subtitle2" color="text.secondary" component="div" gutterBottom>
 							{genre}
@@ -55,7 +65,8 @@ const PlaylistCardDetails = ({ title, imageURL, description, genre, trackCount, 
 					</CardContent>
 				</Card>
 			</Grid>
-		</>
+			<OfflineDataHelper />
+		</Grid>
 	);
 };
 PlaylistCardDetails.propType = {
