@@ -8,12 +8,11 @@ If you don't have a Spotify dev account go [here](https://developer.spotify.com/
 
 Written with a .net core backend and a react frontend. 
 
-deployed to [offlinepocweb.azurewebsites.net](https://offlinepocweb.azurewebsites.net)
-
 This code base shows the transformation of a basic react app with RTKQuery to one with a PWA and offline capabilities. This will alert the user if they are offline and will not allow them to save changes to the form. This will also cache the genres and playlists from spotify so that the user can still interact with the app offline. Note ratings are never cached as an example of how to handle more volatile data that isn't avail offline.
 
+deployed to [offlinepocweb.azurewebsites.net](https://offlinepocweb.azurewebsites.net)
 
-#### Other versions
+### Other versions of this project
 
 There are a few examples of how this project has progressed or the other technologies that have improved over time
 
@@ -42,7 +41,7 @@ if the app goes offline then the user will get an alert banner. This will disabl
 <img width="538" alt="image" src="https://github.com/domshyra-s-playground/offlinePoc/assets/1061957/e886ba9a-7ed7-4f56-a5f0-3886c73601ab"> <img width="304" alt="image" src="https://github.com/domshyra-s-playground/offlinePoc/assets/1061957/282b3a22-105a-40c7-a075-85c87a1e4c92">
 
 
-Here is an example of the cache in the browser. This is the cache for the genres and playlists from spotify as well as any offline assets and data we need to store.
+This is the cache for the genres and playlists from spotify as well as any offline assets and data we need to store for the browser to render an offline instance.
 
 ![image](https://github.com/domshyra-s-playground/offlinePoc/assets/1061957/bca4b4b5-7f2b-4cab-a13d-371eb994a99e)
 
