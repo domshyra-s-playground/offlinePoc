@@ -58,40 +58,13 @@ registerRoute(
 // precache, in this case same-origin .png requests like those from in public/
 registerRoute(
 	// Add in any other file extensions or routing criteria as needed.
-	({ url }) => url.origin === self.location.origin && url.pathname.endsWith(".png"), // Customize this strategy as needed, e.g., by changing to CacheFirst.
+	({ url }) => url.origin === self.location.origin && (url.pathname.endsWith(".png") || url.pathname.endsWith(".ico")), // Customize this strategy as needed, e.g., by changing to CacheFirst.
 	new StaleWhileRevalidate({
 		cacheName: "images",
 		plugins: [
 			// Ensure that once this runtime cache reaches a maximum size the
 			// least-recently used images are removed.
 			new ExpirationPlugin({ maxEntries: 50 }),
-		],
-	})
-);
-
-//TODO! dunno if this is needed
-// //manefest.json
-// registerRoute(
-// 	({ url }) => url.origin === self.location.origin && url.pathname === "/manifest.json",
-// 	new StaleWhileRevalidate({
-// 		cacheName: "manifest",
-// 		plugins: [
-// 			new CacheableResponsePlugin({
-// 				statuses: [200],
-// 			}),
-// 		],
-// 	})
-// );
-//Icons
-registerRoute(
-	// Add in any other file extensions or routing criteria as needed.
-	({ url }) => url.origin === self.location.origin && url.pathname.endsWith(".ico"),
-	new StaleWhileRevalidate({
-		cacheName: "icons",
-		plugins: [
-			new CacheableResponsePlugin({
-				statuses: [200],
-			}),
 		],
 	})
 );
@@ -153,15 +126,8 @@ self.addEventListener("fetch", async (event) => {
 	if (offlineApiRoutes.includes(route)) {
 		key = offlineCacheName;
 	}
-	//TODO! I am not sure if this is needed, once deployed it just 404 since its under wwwroot?? but all those other workbox prechace works? maybe its just not needed
-	// else if (event.request.url.includes("/manifest.json")) {
-	// 	key = "manifest";
-	// } 
-	else if (event.request.url.includes(".ico")) {
-		key = "icons";
-	}
 	//this is for the spotify imgs
-	else if (event.request.url.includes(".png") || event.request.url.startsWith("https://image-cdn-ak")) {
+	else if (event.request.url.includes(".png") || event.request.url.startsWith("https://image-cdn-ak") || event.request.url.includes(".ico")) {
 		key = "images";
 	} else {
 		console.log(`No cache key found for ${event.request.url}`);
