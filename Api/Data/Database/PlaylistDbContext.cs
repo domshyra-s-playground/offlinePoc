@@ -40,6 +40,7 @@ namespace Database
                 .WithMany(p => p.Suggestions)
                 .HasForeignKey(s => s.PlaylistRecommendationEntityId);
 
+
         }
     }
 }

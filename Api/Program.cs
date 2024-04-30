@@ -80,6 +80,7 @@ builder.Services.AddDbContext<PlaylistDbContext>(options =>
 // add identity services
 builder.Services
     .AddIdentityApiEndpoints<UserEntity>()
+    .AddRoles<RoleEntity>()
     .AddEntityFrameworkStores<PlaylistDbContext>();
 
 
