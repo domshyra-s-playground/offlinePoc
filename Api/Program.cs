@@ -110,7 +110,7 @@ app.MapControllers();
 //Routes
 UseSpotifyPlaylistRoutes(app);
 UseRatingsRoutes(app);
-app.MapGet("/secretSecret", () => { return "I've got a secret!"; }).WithName("Secret").WithTags("Secret").RequireAuthorization();
+// app.MapGet("/secretSecret", () => { return "I've got a secret!"; }).WithName("Secret").WithTags("Secret").RequireAuthorization("admin");
 app.MapGroup("/account").WithTags("Account").MapIdentityApi<UserEntity>();
 
 //TODO remove

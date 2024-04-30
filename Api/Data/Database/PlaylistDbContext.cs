@@ -16,7 +16,7 @@ namespace Database
     //?https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-8.0&tabs=netcore-cli
 
 
-    public class PlaylistDbContext : IdentityDbContext<UserEntity>
+    public class PlaylistDbContext : IdentityDbContext<UserEntity, RoleEntity, string>
     {
         public PlaylistDbContext(DbContextOptions<PlaylistDbContext> options) : base(options) { }
         public DbSet<PlaylistRatingEntity> Ratings => Set<PlaylistRatingEntity>();
