@@ -6,18 +6,60 @@ using Microsoft.Extensions.Logging.ApplicationInsights;
 using Database;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.AspNetCore.JsonPatch;
+using Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(setUpActions =>
+            {
+                setUpActions.SwaggerDoc("v1", new OpenApiInfo { Title = "Api", Version = "v1" });
+                setUpActions.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. <br/> 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      <br/>Example: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                setUpActions.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                      {
+                        Reference = new OpenApiReference
+                          {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                          },
+                          Scheme = "oauth2",
+                          Name = "Bearer",
+                          In = ParameterLocation.Header,
+
+                        },
+                        new List<string>()
+                      }
+                    });
+
+                string xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                string xmlFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
+
+                setUpActions.IncludeXmlComments(xmlFullPath);
+            });
 builder.Services.AddControllersWithViews();
 //TODO remove
 builder.Services.AddCors();
-// Add this using directive
+builder.Services.AddAuthorization();
 
+// add db context
 builder.Services.AddDbContext<PlaylistDbContext>(options =>
 {
     if (builder.Environment.IsDevelopment())
@@ -34,6 +76,11 @@ builder.Services.AddDbContext<PlaylistDbContext>(options =>
     }
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
+
+// add identity services
+builder.Services
+    .AddIdentityApiEndpoints<UserEntity>()
+    .AddEntityFrameworkStores<PlaylistDbContext>();
 
 
 builder.Services.AddApplicationInsightsTelemetry();
@@ -57,18 +104,19 @@ var app = builder.Build();
 // }
 app.UseStaticFiles();
 app.UseHttpsRedirection();
-
 app.MapControllers();
 
 
 //Routes
 UseSpotifyPlaylistRoutes(app);
 UseRatingsRoutes(app);
-
+app.MapGet("/secretSecret", () => { return "I've got a secret!"; }).WithName("Secret").WithTags("Secret").RequireAuthorization();
+app.MapGroup("/account").WithTags("Account").MapIdentityApi<UserEntity>();
 
 //TODO remove
 app.UseCors(p => p.WithOrigins(app.Configuration["FrontEndUrl"]).AllowAnyHeader().AllowAnyMethod());
 app.UseRouting();
+app.UseAuthorization();
 app.UseEndpoints(e => e.MapDefaultControllerRoute());
 app.MapFallbackToFile("index.html");
 
